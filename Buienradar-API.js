@@ -4,13 +4,13 @@
 
 var lat = 52.221537;
 var lon = 6.893662;
-var rain_found = 0;
+var rain_found;
+var difMinute;
 var i;
 
-function will_it_rain() {
+function will_it_rain(callback) {
     var request = require('request');
-    //request('http://gps.buienradar.nl/getrr.php?lat=' + lat + '&lon=' + lon, function (error, response, body) {
-    request('http://boelders.nl/uni/test/test-api.html', function (error, response, body) {
+    request('http://gps.buienradar.nl/getrr.php?lat=' + lat + '&lon=' + lon, function (error, response, body) {
       if (!error && response.statusCode == 200) {
         var array = body.split('\r\n'); //split into seperate items
 
@@ -26,26 +26,30 @@ function will_it_rain() {
                 var currentMinute = d.getMinutes();
 
                 if (hours == rainHours) {
-                    var difMinute = rainMinute - currentMinute;
+                    difMinute = rainMinute - currentMinute;
                 }
                 else {
-                    var difMinute = 60 - currentMinute + rainMinute;
+                    difMinute = 60 - currentMinute + rainMinute;
                 }
 
-    			var rain_found = 1;
+    			rain_found = 1;
 
                 console.log(rain_found);
         	}
         }
       }
+      callback();
     })
-    setTimeout(will_it_rain, 1000);
+    setTimeout(will_it_rain, 5 * 60 * 1000);
 };
 
-will_it_rain(); // call function
 
-if (rain_found == 1) {
-        console.log("It's going to rain within the next " + difMinute +" min");
-    } else {
-        console.log("No rain expected within the next 30 min")
-    }
+function logRain() {
+    if (rain_found == 1) {
+            console.log("It's going to rain within the next " + difMinute +" min");
+        } else {
+            console.log("No rain expected within the next 30 min")
+        }
+ }
+
+will_it_rain(logRain) // call function
