@@ -1,0 +1,87 @@
+{
+	"id": "buienradar.weather",
+	"version": "1.0",
+	"name": {
+		"en": "showerradar",
+		"nl": "buienradar"
+	},
+	"description": {
+		"en": "showerradar",
+		"nl": "buienradar"
+	},
+	"author": {
+		"name": {
+			"en": "Freek Boelders"
+		},
+		"website": "http://www.freekwebdesign.nl"
+	},
+	"dependencies": {
+	},
+	"permissions": [
+		"LOCATION",
+		"SAY"
+	],
+	"interfaces": {
+		"speech": {
+			"triggers": [
+
+				{
+					"id": "rain",
+					"importance": 1,
+					"synonyms": {
+						"en": [ "rain", "raining" ],
+						"nl": [ "regen", "regenen" ]
+					}
+				},
+				{
+					"id": "now",
+					"importance": 0.5,
+					"synonyms": {
+						"en": [ "weather" ],
+						"nl": [ "weer" ]
+					}
+				},
+				{
+					"id": "minutes",
+					"importance": 0.3,
+					"synonyms": {
+						"en": [ "minutes" ],
+						"nl": [ "minuten" ]
+					}
+				}
+			]
+		}
+	},
+	"flow": {
+		"triggers": [
+			{
+				"method": "rain_now",
+				"title": {
+					"en": "When it's going to rain within 30 minutes",
+					"nl": "Als het gaat regenen binnen 30 minuten"
+				},
+				"tokens": [
+					{
+						"name": "when",
+						"title": {
+							"en": "when",
+							"nl": "wanneer"
+						},
+						"example": {
+							"en": "7 (in minutes)"
+						}
+					},
+				]
+			}
+		],
+		"conditions": [
+			{
+				"method": "raining",
+				"title": {
+					"en": "It is going to rain within now and the next 30 minutes",
+					"nl": "Het gaat regen binnen nu en 30 minuten"
+				}
+			}
+		]
+	}
+}
