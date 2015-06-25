@@ -11,41 +11,58 @@ module.exports = App;
 var difMinute;
 
 App.prototype.init = function(){
-    console.log("App started");
+    Homey.log("App started");
 
-    // update the weather now, and every 5 min 
-    this.updateWeather( function(difMinute){
-        console.log(difMinute);
+    Homey.manager('speech-input').on('speech', function(speech) {
+        Homey.log("Speech is triggered");
 
+        var spoken_text;
+        var format;
+
+            // loop all triggers
+            speech.triggers.forEach(function(trigger){
+
+                Homey.log ("speech.transcript: " + speech.transcript);
+                
+            });
+
+        Homey.log ("spoken_text: " + spoken_text);
+        app.updateWeather (spoken_text);
         app.events.speech.call(app, speech, difMinute); //call speech function
-    });
+    })
+
+    var location;
+    var lat, lon;
 
     setInterval(trigger_update.bind(this), 1000 * 10 *5); //1000 * 60 * 5
 
     function trigger_update() {
       this.updateWeather( function(difMinute){});
     };
+
+    app.getLocation( function( lat, lon ) {
+      Homey.log (lat);
+    })
 }
 
 //get location
-App.prototype.getLocation = function( callback ) {
-    /*Homey.manager('geolocation').getLocation(function(location) {
+App.prototype.getLocation = function( locationCallback ) {
+    Homey.log("Get geolocation");
+    Homey.manager('geolocation').getLocation(function(location) {
         Homey.log( location );
-    }); */
-    
-    var lat = 52.221537;
-    var lon = 6.893662;
+        var lat, lon;
+        lat = location.latitude;
+        lon = location.longitude;
 
-    // return the location
-    callback( lat, lon );
+        locationCallback(lat, lon);
+    });
 };
 
 // update the weather
 App.prototype.updateWeather = function( callback ) {
-    console.log("Update Weather");
+    Homey.log("Update Weather");
 
     this.getLocation( function( lat, lon ){
-
         var request = require('request');
         request('http://gps.buienradar.nl/getrr.php?lat=' + lat + '&lon=' + lon, function (error, response, body) {
           if (!error && response.statusCode == 200) {
@@ -74,14 +91,15 @@ App.prototype.updateWeather = function( callback ) {
                     difMinute = 5; //dummy variable
                     rain_found = true;
 
-                    console.log(difMinute);
+                    Homey.log(difMinute);
 
-                    callback(difMinute);
+                    //callback(difMinute);
                 } else if (found != 1) {
-                    console.log("No Rain found");
+                    Homey.log("No Rain found");
                     rain_found = false;
-                    difMinute = 5; //dummy variable
-                    callback(difMinute);
+                    //difMinute = 5; //dummy variable
+                    difMinute = 0;
+                    //callback(difMinute);
                     found = 1;
                 };
             }
@@ -92,7 +110,7 @@ App.prototype.updateWeather = function( callback ) {
 
 App.prototype.events = {};
 App.prototype.events.speech = function( speech, difMinute ) {
-    console.log("events.speech");  
+    Homey.log("events.speech");  
 
     var ask_rain;
     var ask_when;
@@ -122,15 +140,15 @@ App.prototype.events.speech = function( speech, difMinute ) {
         
     });
 
-    console.log(ask_rain);
-    console.log(difMinute);
+    Homey.log(ask_rain);
+    Homey.log(difMinute);
 
     this.speakWeather( ask_rain, difMinute, ask_when );
 }
 
 App.prototype.speakWeather = function( ask_rain, difMinute, ask_when ){
-    console.log("speakWeather");
-    console.log(difMinute);
+    Homey.log("speakWeather");
+    Homey.log(difMinute);
 
     var when;
 
@@ -154,9 +172,9 @@ App.prototype.speakWeather = function( ask_rain, difMinute, ask_when ){
 
     if (ask_rain == true && ask_when != "undefined" && difMinute != 999 ){ //Ask rain with specified time
 
-      console.log ('ask_rain:' + ask_rain);
-      console.log ('ask_when:' + ask_when);
-      console.log ('difMinute:' + difMinute)
+      Homey.log ('ask_rain:' + ask_rain);
+      Homey.log ('ask_when:' + ask_when);
+      Homey.log ('difMinute:' + difMinute)
 
       if (parseInt(difMinute) <= parseInt(ask_when)) {
         when = ('Telling: rain expected within the next ' + ask_when + ' minutes');
@@ -168,32 +186,7 @@ App.prototype.speakWeather = function( ask_rain, difMinute, ask_when ){
         when
     ) );*/
 
-    console.log(when);
-};
-
-var speech = {
-   "transcript": "is it going to rain in five minutes",
-   "language": "en",
-   "triggers": [
-     {
-       "id": "rain",
-       "position": 15,
-       "text": "raining"
-     },
-     {
-       "id": "5min",
-       "position": 23,
-       "text": "five minutes"
-     },
-     {
-       "id": "x_minutes",
-       "position": 23,
-       "text": "x minutes"
-     },
-   ],
-   "zones": [],
-   "time": false,
-   "agent": "homey:app:nl.buienradar"
+    Homey.log(when);
 };
 
 var app = new App();

@@ -1,87 +1,100 @@
 {
-	"id": "buienradar.weather",
-	"version": "1.0",
-	"name": {
-		"en": "showerradar",
-		"nl": "buienradar"
-	},
-	"description": {
-		"en": "showerradar",
-		"nl": "buienradar"
-	},
-	"author": {
-		"name": {
-			"en": "Freek Boelders"
-		},
-		"website": "http://www.freekwebdesign.nl"
-	},
-	"dependencies": {
-	},
-	"permissions": [
-		"LOCATION",
-		"SAY"
-	],
-	"interfaces": {
-		"speech": {
-			"triggers": [
-
-				{
-					"id": "rain",
-					"importance": 1,
-					"synonyms": {
-						"en": [ "rain", "raining" ],
-						"nl": [ "regen", "regenen" ]
-					}
-				},
-				{
-					"id": "now",
-					"importance": 0.5,
-					"synonyms": {
-						"en": [ "weather" ],
-						"nl": [ "weer" ]
-					}
-				},
-				{
-					"id": "minutes",
-					"importance": 0.3,
-					"synonyms": {
-						"en": [ "minutes" ],
-						"nl": [ "minuten" ]
-					}
-				}
-			]
-		}
-	},
-	"flow": {
-		"triggers": [
-			{
-				"method": "rain_now",
-				"title": {
-					"en": "When it's going to rain within 30 minutes",
-					"nl": "Als het gaat regenen binnen 30 minuten"
-				},
-				"tokens": [
-					{
-						"name": "when",
-						"title": {
-							"en": "when",
-							"nl": "wanneer"
-						},
-						"example": {
-							"en": "7 (in minutes)"
-						}
-					},
-				]
-			}
-		],
-		"conditions": [
-			{
-				"method": "raining",
-				"title": {
-					"en": "It is going to rain within now and the next 30 minutes",
-					"nl": "Het gaat regen binnen nu en 30 minuten"
-				}
-			}
-		]
-	}
+  "id": "nl.buienradar",
+  "version": "1.0.0",
+  "name": {
+    "en": "Buienradar",
+    "nl": "Shower radar"
+  },
+  "description": {
+    "en": "Dit is de buienradar applicatie",
+    "nl": "Dit is een voorbeeld app voor Homey"
+  },
+  "author": {
+    "name": "Freek Boelders",
+    "email": "freek@athom.nl"
+  },
+  "dependencies": {
+    "socket.io": "^1.1.0"
+  },
+  "permissions": [
+    "homey:manager:speech-output",
+    "homey:manager:media",
+    "homey:manager:speech-input",
+    "homey:manager:geolocation"
+  ],
+  "speech": [
+    {
+      "id": "rain",
+      "importance": 0.9,
+      "synonyms": {
+        "en": [
+          "rain",
+          "raining"
+        ]
+      }
+    },
+    {
+      "id": "weather",
+      "importance": 0.7,
+      "synonyms": {
+        "en": [
+          "weather"
+        ]
+      }
+    },
+    {
+      "id": "minutes",
+      "importance": 0.6,
+      "synonyms": {
+        "en": [
+          "minutes",
+          "minute"
+        ]
+      }
+    },
+    {
+      "id": "hour",
+      "importance": 0.6,
+      "synonyms": {
+        "en": [
+          "hour",
+          "hours"
+        ]
+      }
+    },
+    {
+      "id": "rain",
+      "importance": 0.9,
+      "synonyms": {
+        "en": [
+          "rain",
+          "raining",
+          "rains"
+        ],
+        "nl": [
+          null
+        ]
+      }
+    },
+    {
+      "id": "test",
+      "importance": 0.3,
+      "synonyms": {
+        "en": [
+          "test"
+        ]
+      }
+    }
+  ],
+  "flow": {
+    "triggers": [
+      {
+        "method": "",
+        "title": {
+          "en": "",
+          "nl": ""
+        }
+      }
+    ]
+  }
 }
