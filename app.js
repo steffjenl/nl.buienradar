@@ -3,58 +3,89 @@
 function App() 
 {
     this.cache = {};
-    this.woeid = undefined;
 }
 
 module.exports = App;
+var app = new App();
+app.cache = {}; //Creat app.cache
 
 var difMinute;
+var lat;
+var lon;
 
 App.prototype.init = function(){
     Homey.log("App started");
 
+    //Get location of Homey
+    app.getLocation( function( lat, lon ) {  //Get the location, could be that location is not available yet after reboot
+    })
+
+    //Update weather now and every 5 minutes
+    this.updateWeather( function(difMinute){});
+    setInterval(trigger_update.bind(this), 1000 * 10 *5); //1000 * 60 * 5
+    function trigger_update() {
+      this.updateWeather( function(difMinute){});
+    };
+
+    //Listen for speech triggers
     Homey.manager('speech-input').on('speech', function(speech) {
         Homey.log("Speech is triggered");
 
         var spoken_text;
         var format;
+        var ask_rain;
+        var ask_when;
 
-            // loop all triggers
-            speech.triggers.forEach(function(trigger){
+        speech.triggers.forEach(function(trigger){ //For now it is here but should be in seperate function
 
-                Homey.log ("speech.transcript: " + speech.transcript);
+            if( trigger.id == 'rain' ) {
+                ask_rain = true;
+            } else if ( trigger.id == 'now' ) {
+                ask_when = '0';
+            }
+
+            if( trigger.id == 'rain' ) { // try to find a number
+              Homey.log("Try to find numbers");
+              var numbers = speech.transcript.match(/\d+/);
+                    
+              if( Array.isArray( numbers ) ) {
+                var number = numbers[0];
+                  number = parseInt(number);
                 
-            });
+                if( !isNaN( number ) ) {
+                  if( number > 0 && number <= 30 ) {
+                    ask_when = number;
+                  }
+                }
+              }
+            }
+            
+        });
 
-        Homey.log ("spoken_text: " + spoken_text);
-        app.updateWeather (spoken_text);
-        app.events.speech.call(app, speech, difMinute); //call speech function
+        Homey.log ("spoken_text: " + speech.transcript);
+        app.speakWeather( ask_rain, difMinute, ask_when ); //ask_rain, difMinute, ask_when
+        //app.updateWeather (spoken_text);
+        //app.events.speech.call(); //call speech function
+        //App.events.speech();
     })
 
-    var location;
-    var lat, lon;
-
-    setInterval(trigger_update.bind(this), 1000 * 10 *5); //1000 * 60 * 5
-
-    function trigger_update() {
-      this.updateWeather( function(difMinute){});
-    };
-
-    app.getLocation( function( lat, lon ) {
-      Homey.log (lat);
-    })
 }
 
 //get location
 App.prototype.getLocation = function( locationCallback ) {
     Homey.log("Get geolocation");
-    Homey.manager('geolocation').getLocation(function(location) {
-        Homey.log( location );
-        var lat, lon;
-        lat = location.latitude;
-        lon = location.longitude;
 
-        locationCallback(lat, lon);
+    Homey.manager('geolocation').getLocation(function(location) {
+        if( typeof location.latitude == 'undefined' || location.latitude == 0 ) {
+            locationCallback( new Error("location is undefined") );
+            return;
+        } else {
+            Homey.log( location );
+            lat = location.latitude;
+            lon = location.longitude;
+
+            locationCallback(lat, lon);
+        }
     });
 };
 
@@ -62,7 +93,6 @@ App.prototype.getLocation = function( locationCallback ) {
 App.prototype.updateWeather = function( callback ) {
     Homey.log("Update Weather");
 
-    this.getLocation( function( lat, lon ){
         var request = require('request');
         request('http://gps.buienradar.nl/getrr.php?lat=' + lat + '&lon=' + lon, function (error, response, body) {
           if (!error && response.statusCode == 200) {
@@ -88,10 +118,10 @@ App.prototype.updateWeather = function( callback ) {
                         difMinute = 60 - currentMinute + rainMinute;
                     }
 
-                    difMinute = 5; //dummy variable
+                    //difMinute = 5; //dummy variable
                     rain_found = true;
 
-                    Homey.log(difMinute);
+                    App.cache = difMinute; //Write difMinute into cache
 
                     //callback(difMinute);
                 } else if (found != 1) {
@@ -101,16 +131,17 @@ App.prototype.updateWeather = function( callback ) {
                     difMinute = 0;
                     //callback(difMinute);
                     found = 1;
+
+                    App.cache = difMinute; //Write difMinute into cache
                 };
             }
           }
       }.bind(this));
-    })
 };
 
-App.prototype.events = {};
-App.prototype.events.speech = function( speech, difMinute ) {
-    Homey.log("events.speech");  
+//Listen for speech triggers
+/*App.prototype.speech = function( speech ) {
+    Homey.log("events.speech");
 
     var ask_rain;
     var ask_when;
@@ -119,9 +150,10 @@ App.prototype.events.speech = function( speech, difMinute ) {
 
         if( trigger.id == 'rain' ) {
             ask_rain = true;
-        } else if ( trigger.id == '5min' ) {
-            ask_when = '5';
+        } else if ( trigger.id == 'now' ) {
+            ask_when = '0';
         }
+
         else if( trigger.id == 'x_minutes' ) { //Not working yet
           // try to find a number
           var numbers = speech.transcript.match(/\d+/);
@@ -136,60 +168,60 @@ App.prototype.events.speech = function( speech, difMinute ) {
               }
             }
           }
-        };
+        }
         
     });
 
-    Homey.log(ask_rain);
-    Homey.log(difMinute);
+    Homey.log("ASK RAIN:" + ask_rain);
+    Homey.log("ASK WHEN:" + ask_when);
 
     this.speakWeather( ask_rain, difMinute, ask_when );
-}
+}*/
 
 App.prototype.speakWeather = function( ask_rain, difMinute, ask_when ){
     Homey.log("speakWeather");
-    Homey.log(difMinute);
 
     var when;
+    Homey.log("App.cache: " + App.cache);
+    difMinute = App.cache;
 
-    /*var weather = this.getCache( ask_rain );
-        weather = weather.weather;
-        
-    if( !weather ) {
-        Homey.say( __("I couldn't get the weather. Take a look outside!") );
+    /*if( !difMinute ) {
+        Homey.log("There is now rain information available");
         return false;
+    } else {
+
+    Homey.log("Weather.. this works: " + difMinute);
+
     }*/
 
-    if (ask_rain == true){ //Just asking for rain no specified time
+    var ask_when;
 
-    if( difMinute == '999' ) when = __('no rain expected within the next 30 minutes');
-    if( difMinute <= '5' ) when = __('rain expected within 5 minutes');
-    if( difMinute <= '10' ) when = __('rain expected within 10 minutes');
-    if( difMinute <= '15' ) when = __('rain expected within 15 minutes');
-    if( difMinute <= '30' ) when = __('rain expected within 30 minutes');
+    if (ask_rain == true && ask_when == "undefined"){ //Just asking for rain no specified time
+
+    if( difMinute == '999' ) difMinute = __('no rain expected within the next 30 minutes');
+    if( difMinute <= '5' ) difMinute = __('rain expected within 5 minutes');
+    if( difMinute <= '10' ) difMinute = __('rain expected within 10 minutes');
+    if( difMinute <= '15' ) difMinute = __('rain expected within 15 minutes');
+    if( difMinute <= '30' ) difMinute = __('rain expected within 30 minutes');
 
     };
 
-    if (ask_rain == true && ask_when != "undefined" && difMinute != 999 ){ //Ask rain with specified time
+    if (ask_rain == true && ask_when != "undefined" && difMinute != 999 ){ //Ask rain at specified time
 
-      Homey.log ('ask_rain:' + ask_rain);
-      Homey.log ('ask_when:' + ask_when);
-      Homey.log ('difMinute:' + difMinute)
+      Homey.log ('ask_rain: ' + ask_rain);
+      Homey.log ('ask_when: ' + ask_when);
+      Homey.log ('difMinute: ' + difMinute)
 
-      if (parseInt(difMinute) <= parseInt(ask_when)) {
-        when = ('Telling: rain expected within the next ' + ask_when + ' minutes');
+      if (parseInt(difMinute) <= parseInt(ask_when) && parseInt(difMinute) != 0) { //If difMinut is smaller as ask_when and they are not the same
+        when = "Rain expected within the next " + ask_when + " minutes";
+      } else {
+        when = "No rain expeced within the next " + ask_when + " minutes";
       }
-
-    };
-
-    /*Homey.say( __(
-        when
-    ) );*/
-
-    Homey.log(when);
+    }
+    Homey.log("Homey say: " + when);
+    Homey.manager('speech-output').say( __(when) );
 };
 
-var app = new App();
-app.init(); //call init function
+//app.init(); //call init function
 //app.events.speech.call(app, speech); //call speech function
 //app.speakWeather(); //call speak Weather

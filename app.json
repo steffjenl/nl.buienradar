@@ -24,16 +24,6 @@
   ],
   "speech": [
     {
-      "id": "rain",
-      "importance": 0.9,
-      "synonyms": {
-        "en": [
-          "rain",
-          "raining"
-        ]
-      }
-    },
-    {
       "id": "weather",
       "importance": 0.7,
       "synonyms": {
@@ -53,35 +43,38 @@
       }
     },
     {
-      "id": "hour",
-      "importance": 0.6,
-      "synonyms": {
-        "en": [
-          "hour",
-          "hours"
-        ]
-      }
-    },
-    {
       "id": "rain",
       "importance": 0.9,
       "synonyms": {
         "en": [
-          "rain",
-          "raining",
-          "rains"
-        ],
-        "nl": [
-          null
+          "rain"
         ]
       }
     },
     {
-      "id": "test",
+      "id": "hour",
       "importance": 0.3,
       "synonyms": {
         "en": [
-          "test"
+          "hours",
+          "hour"
+        ]
+      }
+    },
+    {
+      "id": "raining",
+      "importance": 0.9,
+      "synonyms": {}
+    },
+    {
+      "id": "now",
+      "importance": 0.3,
+      "synonyms": {
+        "en": [
+          "now",
+          "at-this-moment",
+          "right-now",
+          "currently"
         ]
       }
     }
