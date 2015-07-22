@@ -2,23 +2,22 @@
   "id": "nl.buienradar",
   "version": "1.0.0",
   "name": {
-    "en": "Buienradar",
-    "nl": "Shower radar"
+    "en": "Shower radar",
+    "nl": "Buienradar"
   },
   "description": {
-    "en": "Dit is de buienradar applicatie",
-    "nl": "Dit is een voorbeeld app voor Homey"
+    "en": "This is the shower radar app for Homey",
+    "nl": "Dit is de buienradar app voor Homey"
   },
   "author": {
     "name": "Freek Boelders",
     "email": "freek@athom.nl"
   },
   "dependencies": {
-    "socket.io": "^1.1.0"
+    "request": "*"
   },
   "permissions": [
     "homey:manager:speech-output",
-    "homey:manager:media",
     "homey:manager:speech-input",
     "homey:manager:geolocation"
   ],
@@ -29,6 +28,9 @@
       "synonyms": {
         "en": [
           "weather"
+        ],
+        "nl": [
+          "weer"
         ]
       }
     },
@@ -39,6 +41,10 @@
         "en": [
           "minutes",
           "minute"
+        ],
+        "nl": [
+          "minuten",
+          "minuut"
         ]
       }
     },
@@ -47,7 +53,14 @@
       "importance": 0.9,
       "synonyms": {
         "en": [
-          "rain"
+          "rain",
+          "shower",
+          "showers"
+        ],
+        "nl": [
+          "regen",
+          "regenen",
+          "buien"
         ]
       }
     },
@@ -58,13 +71,38 @@
         "en": [
           "hours",
           "hour"
+        ],
+        "nl": [
+          "uren",
+          "uur"
         ]
       }
     },
     {
-      "id": "raining",
-      "importance": 0.9,
-      "synonyms": {}
+      "id": "half-hour",
+      "importance": 0.3,
+      "synonyms": {
+        "en": [
+          "half an hour"
+        ],
+        "nl": [
+          "half uur",
+          "half uurtje"
+        ]
+      }
+    },
+    {
+      "id": "quarter",
+      "importance": 0.3,
+      "synonyms": {
+        "en": [
+          "quarter"
+        ],
+        "nl": [
+          "kwartier",
+          "kwartiertje"
+        ]
+      }
     },
     {
       "id": "now",
@@ -72,9 +110,385 @@
       "synonyms": {
         "en": [
           "now",
-          "at-this-moment",
-          "right-now",
+          "at this moment",
+          "right now",
           "currently"
+        ],
+        "nl": [
+          "nu",
+          "op het moment"
+        ]
+      }
+    },
+    {
+      "id": "0",
+      "importance": 0.01,
+      "synonyms": {
+        "en": [
+          "zero"
+        ],
+        "nl": [
+          "nul"
+        ]
+      }
+    },
+    {
+      "id": "1",
+      "importance": 0.01,
+      "synonyms": {
+        "en": [
+          "one"
+        ],
+        "nl": [
+          "een"
+        ]
+      }
+    },
+    {
+      "id": "2",
+      "importance": 0.01,
+      "synonyms": {
+        "en": [
+          "two"
+        ],
+        "nl": [
+          "twee"
+        ]
+      }
+    },
+    {
+      "id": "3",
+      "importance": 0.01,
+      "synonyms": {
+        "en": [
+          "three"
+        ],
+        "nl": [
+          "drie"
+        ]
+      }
+    },
+    {
+      "id": "4",
+      "importance": 0.01,
+      "synonyms": {
+        "en": [
+          "four"
+        ],
+        "nl": [
+          "vier"
+        ]
+      }
+    },
+    {
+      "id": "5",
+      "importance": 0.01,
+      "synonyms": {
+        "en": [
+          "five"
+        ],
+        "nl": [
+          "vijf"
+        ]
+      }
+    },
+    {
+      "id": "6",
+      "importance": 0.01,
+      "synonyms": {
+        "en": [
+          "six"
+        ],
+        "nl": [
+          "zes"
+        ]
+      }
+    },
+    {
+      "id": "7",
+      "importance": 0.01,
+      "synonyms": {
+        "en": [
+          "seven"
+        ],
+        "nl": [
+          "seven"
+        ]
+      }
+    },
+    {
+      "id": "8",
+      "importance": 0.01,
+      "synonyms": {
+        "en": [
+          "eight"
+        ],
+        "nl": [
+          "acht"
+        ]
+      }
+    },
+    {
+      "id": "9",
+      "importance": 0.01,
+      "synonyms": {
+        "en": [
+          "nine"
+        ],
+        "nl": [
+          "negen"
+        ]
+      }
+    },
+    {
+      "id": "10",
+      "importance": 0.01,
+      "synonyms": {
+        "en": [
+          "ten"
+        ],
+        "nl": [
+          "tien"
+        ]
+      }
+    },
+    {
+      "id": "11",
+      "importance": 0.01,
+      "synonyms": {
+        "en": [
+          "eleven"
+        ],
+        "nl": [
+          "elf"
+        ]
+      }
+    },
+    {
+      "id": "12",
+      "importance": 0.01,
+      "synonyms": {
+        "en": [
+          "twelve"
+        ],
+        "nl": [
+          "twaalf"
+        ]
+      }
+    },
+    {
+      "id": "13",
+      "importance": 0.01,
+      "synonyms": {
+        "en": [
+          "thirteen"
+        ],
+        "nl": [
+          "dertien"
+        ]
+      }
+    },
+    {
+      "id": "14",
+      "importance": 0.01,
+      "synonyms": {
+        "en": [
+          "fourteen"
+        ],
+        "nl": [
+          "veertien"
+        ]
+      }
+    },
+    {
+      "id": "15",
+      "importance": 0.01,
+      "synonyms": {
+        "en": [
+          "fifteen"
+        ],
+        "nl": [
+          "vijftien"
+        ]
+      }
+    },
+    {
+      "id": "16",
+      "importance": 0.01,
+      "synonyms": {
+        "en": [
+          "sixteen"
+        ],
+        "nl": [
+          "zestien"
+        ]
+      }
+    },
+    {
+      "id": "17",
+      "importance": 0.01,
+      "synonyms": {
+        "en": [
+          "seventeen"
+        ],
+        "nl": [
+          "zeventien"
+        ]
+      }
+    },
+    {
+      "id": "18",
+      "importance": 0.01,
+      "synonyms": {
+        "en": [
+          "eighteen"
+        ],
+        "nl": [
+          "achtien"
+        ]
+      }
+    },
+    {
+      "id": "19",
+      "importance": 0.01,
+      "synonyms": {
+        "en": [
+          "nineteen"
+        ],
+        "nl": [
+          "negentien"
+        ]
+      }
+    },
+    {
+      "id": "20",
+      "importance": 0.01,
+      "synonyms": {
+        "en": [
+          "twenty"
+        ],
+        "nl": [
+          "twintig"
+        ]
+      }
+    },
+    {
+      "id": "21",
+      "importance": 0.01,
+      "synonyms": {
+        "en": [
+          "twenty-one"
+        ],
+        "nl": [
+          "eenentwintig"
+        ]
+      }
+    },
+    {
+      "id": "22",
+      "importance": 0.01,
+      "synonyms": {
+        "en": [
+          "twenty-two"
+        ],
+        "nl": [
+          "tweeentwintig"
+        ]
+      }
+    },
+    {
+      "id": "23",
+      "importance": 0.01,
+      "synonyms": {
+        "en": [
+          "twenty-three"
+        ],
+        "nl": [
+          "drieentwintig"
+        ]
+      }
+    },
+    {
+      "id": "24",
+      "importance": 0.01,
+      "synonyms": {
+        "en": [
+          "twenty-four"
+        ],
+        "nl": [
+          "vierentwintig"
+        ]
+      }
+    },
+    {
+      "id": "25",
+      "importance": 0.01,
+      "synonyms": {
+        "en": [
+          "twenty-five"
+        ],
+        "nl": [
+          "vijfentwintig"
+        ]
+      }
+    },
+    {
+      "id": "26",
+      "importance": 0.01,
+      "synonyms": {
+        "en": [
+          "twenty-six"
+        ],
+        "nl": [
+          "zesentwintig"
+        ]
+      }
+    },
+    {
+      "id": "27",
+      "importance": 0.01,
+      "synonyms": {
+        "en": [
+          "twenty-seven"
+        ],
+        "nl": [
+          "zevenentwintig"
+        ]
+      }
+    },
+    {
+      "id": "28",
+      "importance": 0.01,
+      "synonyms": {
+        "en": [
+          "twenty-eight"
+        ],
+        "nl": [
+          "achtentwintig"
+        ]
+      }
+    },
+    {
+      "id": "29",
+      "importance": 0.01,
+      "synonyms": {
+        "en": [
+          "twenty-nine"
+        ],
+        "nl": [
+          "negenentwintig"
+        ]
+      }
+    },
+    {
+      "id": "30",
+      "importance": 0.01,
+      "synonyms": {
+        "en": [
+          "thirty"
+        ],
+        "nl": [
+          "dertig"
         ]
       }
     }
@@ -82,10 +496,53 @@
   "flow": {
     "triggers": [
       {
-        "method": "",
+        "method": "rain_start",
         "title": {
-          "en": "",
-          "nl": ""
+          "en": "It starts raining",
+          "nl": "Het begint met regenen"
+        }
+      },
+      {
+        "method": "rain_stop",
+        "title": {
+          "en": "It stops raining",
+          "nl": "Het stopt met regenen"
+        }
+      },
+      {
+        "method": "raining_in",
+        "title": {
+          "en": "It is going to rain in...",
+          "nl": "Het gaat regenen in..."
+        },
+        "args": []
+      }
+    ],
+    "conditions": [
+      {
+        "method": "rain_start",
+        "title": {
+          "en": "It starts raining"
+        }
+      },
+      {
+        "method": "rain_stop",
+        "title": {
+          "en": "It stops raining"
+        }
+      },
+      {
+        "method": "raining_in",
+        "title": {
+          "en": "It is going to rain in..."
+        }
+      }
+    ],
+    "actions": [
+      {
+        "method": "stop_raining",
+        "title": {
+          "en": "Make it stop raining. Hahaha."
         }
       }
     ]
