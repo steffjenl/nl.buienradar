@@ -1,0 +1,23 @@
+{
+	"yes": "ja",
+	"no": "nee",
+	"light": "lichte",
+	"moderate": "gemiddelde",
+	"heavy": "zware",
+	"hour": "uur",
+	"hours": "uren",
+	"minute": "minuut",
+	"minutes": "minuten",
+	"now": "nu",
+	"whitin": "binnen",
+	"before": "voor",
+	"after": "na",
+	"at": "om",
+	"only_two_hours": "Buienradar kan alleen voorspellingen 2 uur vooruit doen, vraag alsjeblieft je vraag nog een keer maar dan binnen twee uur",
+	"start_rain": "__yesNo__, het gaat regenen binnen __options.when__",
+	"stop_rain": "__yesNo__, het gaat stoppen met regenen binnen __options.when__",
+	"not_start_rain": "__yesNo__, het gaat niet regenen binnen __options.when__",
+	"not_stop_rain": "__yesNo__, het gaat niet stoppen met regenen binnen __options.when__",
+	"rain": "__yesNo__, er is __rainIntensity__ regen verwacht __options.whenRelative__ __options.when__",
+    "no_rain": "__yesNo__, er wordt geen regen verwacht __options.whenRelative__ __options.when__"
+}

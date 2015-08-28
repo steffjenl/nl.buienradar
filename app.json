@@ -1,6 +1,7 @@
 {
   "id": "nl.buienradar",
   "version": "1.0.0",
+  "compatibility": "0.x || 1.x",
   "name": {
     "en": "Shower radar",
     "nl": "Buienradar"
@@ -24,8 +25,8 @@
   "speech": [
     {
       "id": "weather",
-      "importance": 0.7,
-      "synonyms": {
+      "importance": 0.6,
+      "triggers": {
         "en": [
           "weather"
         ],
@@ -37,7 +38,7 @@
     {
       "id": "minutes",
       "importance": 0.6,
-      "synonyms": {
+      "triggers": {
         "en": [
           "minutes",
           "minute"
@@ -51,11 +52,12 @@
     {
       "id": "rain",
       "importance": 0.9,
-      "synonyms": {
+      "triggers": {
         "en": [
           "rain",
           "shower",
-          "showers"
+          "showers",
+          "raining"
         ],
         "nl": [
           "regen",
@@ -65,9 +67,170 @@
       }
     },
     {
+      "id": "dry",
+      "importance": 0.9,
+      "triggers": {
+        "en": [
+          "dry",
+          "stops raining"
+        ],
+        "nl": [
+          "droog",
+          "stop de regen",
+          "stopt het met regenen"
+        ]
+      }
+    },
+    {
+      "id": "no",
+      "importance": 0.3,
+      "triggers": {
+        "en": [
+          "no",
+          "not"
+        ],
+        "nl": [
+          "niet",
+          "geen"
+        ]
+      }
+    },
+    {
+      "id": "stop",
+      "importance": 0.3,
+      "triggers": {
+        "en": [
+          "stop",
+          "end",
+          "ends"
+        ],
+        "nl": [
+          "stoppen",
+          "stopt"
+        ]
+      }
+    },
+    {
+      "id": "start",
+      "importance": 0.3,
+      "triggers": {
+        "en": [
+          "start",
+          "begin"
+        ],
+        "nl": [
+          "starten",
+          "beginnen"
+        ]
+      }
+    },
+    {
+      "id": "when",
+      "importance": 0.3,
+      "triggers": {
+        "en": [
+          "when",
+          "what time"
+        ],
+        "nl": [
+          "wanneer",
+          "op welke tijd"
+        ]
+      }
+    },
+    {
+      "id": "before",
+      "importance": 0.3,
+      "triggers": {
+        "en": [
+          "before",
+          "for",
+          "until"
+        ],
+        "nl": [
+          "voor",
+          "tot"
+        ]
+      }
+    },
+    {
+      "id": "after",
+      "importance": 0.3,
+      "triggers": {
+        "en": [
+          "after",
+          "passed"
+        ],
+        "nl": [
+          "na",
+          "later"
+        ]
+      }
+    },
+    {
+      "id": "at",
+      "importance": 0.3,
+      "triggers": {
+        "en": [
+          "at",
+          "on"
+        ],
+        "nl": [
+          "om",
+          "op"
+        ]
+      }
+    },
+    {
+      "id": "light",
+      "importance": 0.3,
+      "triggers": {
+        "en": [
+          "light",
+          "little",
+          "drizzle"
+        ],
+        "nl": [
+          "licht",
+          "lichte",
+          "miezeren"
+        ]
+      }
+    },
+    {
+      "id": "moderate",
+      "importance": 0.3,
+      "triggers": {
+        "en": [
+          "moderate",
+          "normal"
+        ],
+        "nl": [
+          "gemiddeld",
+          "normaal"
+        ]
+      }
+    },
+    {
+      "id": "heavy",
+      "importance": 0.3,
+      "triggers": {
+        "en": [
+          "heavy",
+          "heavily",
+          "intense"
+        ],
+        "nl": [
+          "zwaar",
+          "zware",
+          "intens"
+        ]
+      }
+    },
+    {
       "id": "hour",
       "importance": 0.3,
-      "synonyms": {
+      "triggers": {
         "en": [
           "hours",
           "hour"
@@ -79,9 +242,23 @@
       }
     },
     {
+      "id": "two_hours",
+      "importance": 0.3,
+      "triggers": {
+        "en": [
+          "two hours",
+          "2 hours"
+        ],
+        "nl": [
+          "twee uur",
+          "2 uur"
+        ]
+      }
+    },
+    {
       "id": "half-hour",
       "importance": 0.3,
-      "synonyms": {
+      "triggers": {
         "en": [
           "half an hour"
         ],
@@ -94,7 +271,7 @@
     {
       "id": "quarter",
       "importance": 0.3,
-      "synonyms": {
+      "triggers": {
         "en": [
           "quarter"
         ],
@@ -107,7 +284,7 @@
     {
       "id": "now",
       "importance": 0.3,
-      "synonyms": {
+      "triggers": {
         "en": [
           "now",
           "at this moment",
@@ -123,7 +300,7 @@
     {
       "id": "0",
       "importance": 0.01,
-      "synonyms": {
+      "triggers": {
         "en": [
           "zero"
         ],
@@ -135,7 +312,7 @@
     {
       "id": "1",
       "importance": 0.01,
-      "synonyms": {
+      "triggers": {
         "en": [
           "one"
         ],
@@ -147,7 +324,7 @@
     {
       "id": "2",
       "importance": 0.01,
-      "synonyms": {
+      "triggers": {
         "en": [
           "two"
         ],
@@ -159,7 +336,7 @@
     {
       "id": "3",
       "importance": 0.01,
-      "synonyms": {
+      "triggers": {
         "en": [
           "three"
         ],
@@ -171,7 +348,7 @@
     {
       "id": "4",
       "importance": 0.01,
-      "synonyms": {
+      "triggers": {
         "en": [
           "four"
         ],
@@ -183,7 +360,7 @@
     {
       "id": "5",
       "importance": 0.01,
-      "synonyms": {
+      "triggers": {
         "en": [
           "five"
         ],
@@ -195,7 +372,7 @@
     {
       "id": "6",
       "importance": 0.01,
-      "synonyms": {
+      "triggers": {
         "en": [
           "six"
         ],
@@ -207,7 +384,7 @@
     {
       "id": "7",
       "importance": 0.01,
-      "synonyms": {
+      "triggers": {
         "en": [
           "seven"
         ],
@@ -219,7 +396,7 @@
     {
       "id": "8",
       "importance": 0.01,
-      "synonyms": {
+      "triggers": {
         "en": [
           "eight"
         ],
@@ -231,7 +408,7 @@
     {
       "id": "9",
       "importance": 0.01,
-      "synonyms": {
+      "triggers": {
         "en": [
           "nine"
         ],
@@ -243,7 +420,7 @@
     {
       "id": "10",
       "importance": 0.01,
-      "synonyms": {
+      "triggers": {
         "en": [
           "ten"
         ],
@@ -255,7 +432,7 @@
     {
       "id": "11",
       "importance": 0.01,
-      "synonyms": {
+      "triggers": {
         "en": [
           "eleven"
         ],
@@ -267,7 +444,7 @@
     {
       "id": "12",
       "importance": 0.01,
-      "synonyms": {
+      "triggers": {
         "en": [
           "twelve"
         ],
@@ -279,7 +456,7 @@
     {
       "id": "13",
       "importance": 0.01,
-      "synonyms": {
+      "triggers": {
         "en": [
           "thirteen"
         ],
@@ -291,7 +468,7 @@
     {
       "id": "14",
       "importance": 0.01,
-      "synonyms": {
+      "triggers": {
         "en": [
           "fourteen"
         ],
@@ -303,7 +480,7 @@
     {
       "id": "15",
       "importance": 0.01,
-      "synonyms": {
+      "triggers": {
         "en": [
           "fifteen"
         ],
@@ -315,7 +492,7 @@
     {
       "id": "16",
       "importance": 0.01,
-      "synonyms": {
+      "triggers": {
         "en": [
           "sixteen"
         ],
@@ -327,7 +504,7 @@
     {
       "id": "17",
       "importance": 0.01,
-      "synonyms": {
+      "triggers": {
         "en": [
           "seventeen"
         ],
@@ -339,7 +516,7 @@
     {
       "id": "18",
       "importance": 0.01,
-      "synonyms": {
+      "triggers": {
         "en": [
           "eighteen"
         ],
@@ -351,7 +528,7 @@
     {
       "id": "19",
       "importance": 0.01,
-      "synonyms": {
+      "triggers": {
         "en": [
           "nineteen"
         ],
@@ -363,7 +540,7 @@
     {
       "id": "20",
       "importance": 0.01,
-      "synonyms": {
+      "triggers": {
         "en": [
           "twenty"
         ],
@@ -375,7 +552,7 @@
     {
       "id": "21",
       "importance": 0.01,
-      "synonyms": {
+      "triggers": {
         "en": [
           "twenty-one"
         ],
@@ -387,7 +564,7 @@
     {
       "id": "22",
       "importance": 0.01,
-      "synonyms": {
+      "triggers": {
         "en": [
           "twenty-two"
         ],
@@ -399,7 +576,7 @@
     {
       "id": "23",
       "importance": 0.01,
-      "synonyms": {
+      "triggers": {
         "en": [
           "twenty-three"
         ],
@@ -411,7 +588,7 @@
     {
       "id": "24",
       "importance": 0.01,
-      "synonyms": {
+      "triggers": {
         "en": [
           "twenty-four"
         ],
@@ -423,7 +600,7 @@
     {
       "id": "25",
       "importance": 0.01,
-      "synonyms": {
+      "triggers": {
         "en": [
           "twenty-five"
         ],
@@ -435,7 +612,7 @@
     {
       "id": "26",
       "importance": 0.01,
-      "synonyms": {
+      "triggers": {
         "en": [
           "twenty-six"
         ],
@@ -447,7 +624,7 @@
     {
       "id": "27",
       "importance": 0.01,
-      "synonyms": {
+      "triggers": {
         "en": [
           "twenty-seven"
         ],
@@ -459,7 +636,7 @@
     {
       "id": "28",
       "importance": 0.01,
-      "synonyms": {
+      "triggers": {
         "en": [
           "twenty-eight"
         ],
@@ -471,7 +648,7 @@
     {
       "id": "29",
       "importance": 0.01,
-      "synonyms": {
+      "triggers": {
         "en": [
           "twenty-nine"
         ],
@@ -483,7 +660,7 @@
     {
       "id": "30",
       "importance": 0.01,
-      "synonyms": {
+      "triggers": {
         "en": [
           "thirty"
         ],
@@ -491,60 +668,223 @@
           "dertig"
         ]
       }
+    },
+    {
+      "id": "40",
+      "importance": 0.01,
+      "triggers": {
+        "en": [
+          "fourthy"
+        ],
+        "nl": [
+          "veertig"
+        ]
+      }
+    },
+    {
+      "id": "45",
+      "importance": 0.01,
+      "triggers": {
+        "en": [
+          "fourthy-five"
+        ],
+        "nl": [
+          "vijfenveertig"
+        ]
+      }
+    },
+    {
+      "id": "50",
+      "importance": 0.01,
+      "triggers": {
+        "en": [
+          "fifty"
+        ],
+        "nl": [
+          "vijftig"
+        ]
+      }
+    },
+    {
+      "id": "60",
+      "importance": 0.01,
+      "triggers": {
+        "en": [
+          "sixty"
+        ],
+        "nl": [
+          "zestig"
+        ]
+      }
+    },
+    {
+      "id": "70",
+      "importance": 0.01,
+      "triggers": {
+        "en": [
+          "seventy"
+        ],
+        "nl": [
+          "zeventig"
+        ]
+      }
+    },
+    {
+      "id": "80",
+      "importance": 0.01,
+      "triggers": {
+        "en": [
+          "eighty"
+        ],
+        "nl": [
+          "tachtig"
+        ]
+      }
+    },
+    {
+      "id": "90",
+      "importance": 0.01,
+      "triggers": {
+        "en": [
+          "ninety"
+        ],
+        "nl": [
+          "negentig"
+        ]
+      }
+    },
+    {
+      "id": "100",
+      "importance": 0.01,
+      "triggers": {
+        "en": [
+          "hunderd"
+        ],
+        "nl": [
+          "honderd"
+        ]
+      }
+    },
+    {
+      "id": "110",
+      "importance": 0.01,
+      "triggers": {
+        "en": [
+          "hunderd ten"
+        ],
+        "nl": [
+          "honderdtien"
+        ]
+      }
+    },
+    {
+      "id": "120",
+      "importance": 0.01,
+      "triggers": {
+        "en": [
+          "hunder twenty"
+        ],
+        "nl": [
+          "honderdtwintig"
+        ]
+      }
     }
   ],
   "flow": {
     "triggers": [
       {
-        "method": "rain_start",
+        "id": "rain_start",
         "title": {
           "en": "It starts raining",
           "nl": "Het begint met regenen"
         }
       },
       {
-        "method": "rain_stop",
+        "id": "rain_stop",
         "title": {
           "en": "It stops raining",
           "nl": "Het stopt met regenen"
         }
       },
       {
-        "method": "raining_in",
+        "id": "raining_in",
         "title": {
           "en": "It is going to rain in...",
           "nl": "Het gaat regenen in..."
         },
-        "args": []
+        "args": [
+          {
+            "name": "when",
+            "type": "dropdown",
+            "values": [
+              {
+                "id": "5",
+                "label": {
+                  "en": "5 minutes",
+                  "nl": "5 minuten"
+                }
+              },
+              {
+                "id": "10",
+                "label": {
+                  "en": "10 minutes",
+                  "nl": "10 minuten"
+                }
+              },
+              {
+                "id": "15",
+                "label": {
+                  "en": "15 minutes",
+                  "nl": "15 minuten"
+                }
+              },
+              {
+                "id": "30",
+                "label": {
+                  "en": "30 minutes",
+                  "nl": "30 minuten"
+                }
+              },
+              {
+                "id": "45",
+                "label": {
+                  "en": "45 minutes",
+                  "nl": "45 minuten"
+                }
+              },
+              {
+                "id": "60",
+                "label": {
+                  "en": "1 hour",
+                  "nl": "1 hour"
+                }
+              }
+            ]
+          }
+        ]
       }
     ],
     "conditions": [
       {
-        "method": "rain_start",
+        "id": "rain_start",
         "title": {
           "en": "It starts raining"
         }
       },
       {
-        "method": "rain_stop",
+        "id": "rain_stop",
         "title": {
           "en": "It stops raining"
         }
       },
       {
-        "method": "raining_in",
+        "id": "raining_in",
         "title": {
           "en": "It is going to rain in..."
         }
       }
     ],
     "actions": [
-      {
-        "method": "stop_raining",
-        "title": {
-          "en": "Make it stop raining. Hahaha."
-        }
-      }
     ]
   }
 }
