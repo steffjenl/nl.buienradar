@@ -102,6 +102,8 @@ module.exports.onSpeech = function(speech) {
 
             if ( trigger.id == 'when' ) {
                 options['speechContains'].push.apply(options['speechContains'], ['when']);
+            } else if ( trigger.id == 'how' ) {
+                options['speechContains'].push.apply(options['speechContains'], ['how']);
             } else if ( trigger.id == 'start' ) {
                 options['speechContains'].push.apply(options['speechContains'], ['start']);
             } else if ( trigger.id == 'stop' ) {
@@ -148,8 +150,8 @@ module.exports.getLocation = function( locationCallback ) {
 module.exports.updateWeather = function( callback ) {
     Homey.log("Update Weather");
 
-        cache = {} //Clear rainInfo
-        rainInfo = {} //Clear rainInfo
+        cache = {};
+        rainInfo = {};
 
         if (lat == undefined) { //if no location, try to get it
             self.getLocation( function( lat, lon ) {  //Get the location, could be that location is not available yet after reboot
@@ -164,13 +166,11 @@ module.exports.updateWeather = function( callback ) {
           var request = require('request');
           request('http://gps.buienradar.nl/getrr.php?lat=' + lat + '&lon=' + lon, function (error, response, body) {
           if (!error && response.statusCode == 200) {
-            //var array = "000|18:45,000|18:50,000|18:55,000|19:00,000|19:05,000|19:10,000|19:15,000|19:20,000|19:25,000|19:30,000|19:35,000|19:40,000|19:45,000|19:50,000|19:55,080|20:00,070|20:05,060|20:10,000|20:15,000|20:20,000|20:25,000|20:30,000|20:35,000|20:40,000|20:45";
-            //var array = array.split(','); //Enable this line again when using testing string isntead of the real weather
+            //var array = "000|15:45,000|15:50,000|15:55,000|16:00,000|16:05,000|16:10,000|16:15,000|16:20,000|16:25,000|16:30,000|16:35,000|16:40,000|16:45,000|16:50,000|16:55,000|17:00,000|17:05,000|17:10,000|17:15,000|17:20,000|17:25,010|17:30,020|17:35,030|17:40,010|17:45";
+            //var array = array.split(','); //Enable this line again when using testing string instead of the real weather
             var array = body.split('\r\n'); //split into seperate items
 
-            Homey.log ("Array: " + array);
-            //Homey.log ("Lat: " + lat);
-            //Homey.log ("Lon: " + lon);
+            Homey.log ("Array: " + array); //location
 
             var rain_found;
             var rainTotal = 0;
@@ -179,7 +179,7 @@ module.exports.updateWeather = function( callback ) {
             var firstEntry;
             var firstDifMinute;
 
-            for (var i = 2; i < 24; i++) { //get the coming 60 min (ignore first 2 items) (12 x 5 = 60)
+            for (var i = 2; i < 24; i++) { //get the coming 120 min (ignore first 2 items)
                 var array2 = array[i].split('|'); //split rain and time
                     var rainMm = parseInt(array2[0]); //Take mm and make it a int
                     var rainTime = array2[1];
@@ -189,9 +189,7 @@ module.exports.updateWeather = function( callback ) {
                     var hours = d.getHours();
                     var currentMinute = d.getMinutes();
 
-                    //Homey.log('hour check', hours, rainHours);
-
-                    hours = parseInt(hours) + 2;
+                    //hours = parseInt(hours) + 2;
 
                     if (hours == rainHours) {
                         difMinute = rainMinute - currentMinute;
@@ -202,29 +200,24 @@ module.exports.updateWeather = function( callback ) {
                         difMinute = 120 - currentMinute + rainMinute;
                     }
 
-                    if (difMinute < 0) difMinute = 0; //Make a int that is just below 0 a 0
+                    if (difMinute < 0) difMinute = 0; //Make a 'int' that is just below 0 a 0
 
                     if (firstEntry !== false) {
                         firstDifMinute = difMinute;
                         firstEntry = false;
                     }
 
-                    //Homey.log('difMinute', difMinute);
-
                     rainTotal = rainTotal + rainMm;
                     rainEntrys = rainEntrys + 1;
-                    //rain_found = true;
 
                 var rainMm = parseInt(array2[0]); //Take mm and make it a int
                 var rainTime = array2[1];
 
-                rainInfo[ difMinute ] = { //Extend the existing object with the new device
+                rainInfo[ difMinute ] = { //Extend the existing rainInfo object with the new content
                     mm: rainMm
                 };
 
                 cache = rainInfo;
-
-                //Homey.log(cache);
             }
           }
       }.bind(this));
@@ -234,26 +227,26 @@ module.exports.speakWeather = function( options ){
     Homey.log("speakWeather");
 
     var rainInfo = cache;
-    var mm;
-    var rainFound;
-    var dryFound;
     var rainTotal = 0;
     var rainAverage = 0;
     var rainEntrys = 0;
     var start;
     var stop;
     var found = false;
-    var noRain;
     var output;
     var rainIntensity;
+    var foundIntensity = false;
     var yesNo;
+    var lastObj;
+    specificRainInfo = {}; //clear
 
-    Homey.log(arguments);
+    Homey.log(arguments); //Log what is asked
 
+    //Get a specific part of the rain info
     for (var time in rainInfo) {
         var mm = (rainInfo[time].mm); //Rain
         if (options.when == null) { //If no time specified, get everything
-            specificRainInfo[ time ] = { //fill the specificRainInfo object with the specific requested information
+            specificRainInfo[ time ] = { //fill the specificRainInfo object
                 mm: mm
             };
             rainTotal = rainTotal + mm;
@@ -261,7 +254,7 @@ module.exports.speakWeather = function( options ){
             //Homey.log("not time");
         } else if (options.whenRelative == 'at' || options.when == 0) {
             if (time == options.when) {
-                specificRainInfo[ time ] = { //fill the specificRainInfo object with the specific requested information
+                specificRainInfo[ time ] = {
                     mm: mm
                 };
                 rainTotal = rainTotal + mm;
@@ -270,7 +263,7 @@ module.exports.speakWeather = function( options ){
             }
         } else if (options.whenRelative == 'before' || options.whenRelative == null) { //If before or not defined
             if (time <= options.when) {
-                specificRainInfo[ time ] = { //fill the specificRainInfo object with the specific requested information
+                specificRainInfo[ time ] = {
                     mm: mm
                 };
                 rainTotal = rainTotal + mm;
@@ -279,7 +272,7 @@ module.exports.speakWeather = function( options ){
             }
         } else if (options.whenRelative == 'after') {
             if (time >= options.when) {
-                specificRainInfo[ time ] = { //fill the specificRainInfo object with the specific requested information
+                specificRainInfo[ time ] = { 
                     mm: mm
                 };
                 rainTotal = rainTotal + mm;
@@ -289,27 +282,30 @@ module.exports.speakWeather = function( options ){
         }
     }
 
-    Homey.log(typeof rainTotal, rainTotal, typeof rainEntrys, rainEntrys)
-
+    //Calculate average rain amount
     if (rainEntrys != 0) {
         rainAverage = rainTotal / rainEntrys;
     }
 
-    Homey.log("rainAverage", rainAverage)
-    Homey.log(specificRainInfo);
+    Homey.log("rainAverage", rainAverage); //Log the amount of rain
+    Homey.log(specificRainInfo); //Show the array of raiEntrys
 
+    // Check intensity
     for (var time in specificRainInfo) {
         var mm = (specificRainInfo[time].mm); //Rain
-        //Homey.log('time', time, 'mm', mm, 'options', options)
+        lastObj = false;
 
         if (mm > 0) { //It contains rain
             if (options.intensity == null) { //No certain intensity
                 if (found == false) { start = time; found = true };
                 stop = time;
+                lastObj = true;
                 Homey.log("It will rain without intensity!")
             } else if (options.intensity < mm) { //Certain intensity
                 if (found == false) { start = time; found = true };
                 stop = time;
+                lastObj = true;
+                foundIntensity = true;
                 Homey.log("It will rain that hard!")
             }
         }
@@ -318,43 +314,55 @@ module.exports.speakWeather = function( options ){
         }
     }
 
-    Homey.log('rainAverage', rainAverage)
+    if (lastObj == true ) stop = null; //If last entry is rain, the rain is not going to stop
 
+    //Determine words for intensity to speakout
     if (rainAverage == 0) rainIntensity = __("no");
     if (rainAverage < 85) rainIntensity = __("light");
     if (rainAverage > 85 && rainAverage < 255) rainIntensity = __("moderate");
     if (rainAverage > 255) rainIntensity = __("heavy");
 
-    if (rainAverage == 0) {yesNo = __("no")};
-    if (rainAverage > 0) {yesNo = __("yes")};
-    if (rainAverage == 0 && options.rain == false) {yesNo = __("yes")};
-    if (rainAverage > 0 && options.rain == false) {yesNo = __("no")};
+    //Normal yes and no
+    if (rainAverage == 0) yesNo = __("no");
+    if (rainAverage > 0) yesNo = __("yes");
+    if (rainAverage == 0 && options.rain == false) yesNo = __("yes");
+    if (rainAverage > 0 && options.rain == false) yesNo = __("no");
 
-    //When a not turn the YesNo around
+    //When asked for a certain intensity
+    if (foundIntensity == true && options.intensity != null) yesNo = __("yes");
+    if (foundIntensity == false && options.intensity != null) yesNo = __("no");
+
+    //When the senteces contains a "not" turn the YesNo around
     if (options.speechContains.indexOf("no") > -1) {if (yesNo == __("yes")){yesNo = __("no")} else if (yesNo == __("no")){yesNo = __("yes")} };
 
-    Homey.log('options.when', options.when);
-
+    //Custom words and options for certain questions
+    if (options.speechContains.indexOf("when") > -1 && options.when == null && start != null) options.when = start + " " + __("minutes"); // If speech contains "when" and no certain time and start exists
+    if (options.speechContains.indexOf("when") > -1 && options.speechContains.indexOf("start" && start != null) > -1) options.when = start + " " + __("minutes"); //If speech contains "when" and "start" and start exists
+    if (options.speechContains.indexOf("when") > -1 && options.speechContains.indexOf("stop" && stop != null) > -1) options.when = stop + " " + __("minutes"); //If speech contains "when" and "stop" and stop exists
+    if (options.speechContains.indexOf("when") > -1 || options.speechContains.indexOf("how") > -1) yesNo = ""; //Don't say Yes or No when user asks for when or how
+    
     if (options.when == null) options.when = '2 ' + __("hours"); 
     if (options.when < 120) options.when = options.when + " " + __("minutes");
     if (options.when == 120) options.when = '2 ' + __("hours"); 
     if (options.when == 60) options.when = '1 ' + __("hour"); 
     if (options.when == 1) options.when = options.when + " " + __("minutes"); 
     if (options.when == 0) options.when = __("now");
-    if (options.whenRelative == null) options.whenRelative = __("whitin"); //By default it is within
+    
+    if (options.whenRelative == null && options.speechContains.indexOf("start") > -1 || options.speechContains.indexOf("stop") > -1) options.whenRelative = __("at"); //But if it is start or stop make it at
+    if (options.whenRelative == null) options.whenRelative = __("in"); //By default it is in
     if (options.whenRelative == "before") options.whenRelative = __("before"); 
     if (options.whenRelative == "after") options.whenRelative = __("after"); 
-    if (options.whenRelative == "at") options.whenRelative = __("at");
-    if (options.speechContains.indexOf("when") > -1) yesNo = ""; //Don't say Yes or No when user asks for when
+    if (options.whenRelative == "at") options.whenRelative = __("in"); //ToDo fix "at" in "in" issue
 
+    //Speak one of the sentences
     if (options.speechContains.indexOf("start") > -1 && start != null) {
-        output = __("start_rain", { "yesNo": yesNo, "options.when": options.when } );
+        output = __("start_rain", { "yesNo": yesNo, "rainIntensity": rainIntensity, "options.whenRelative": options.whenRelative, "options.when": options.when } );
     } else if (options.speechContains.indexOf("stop") > -1 && stop != null) {
-        output = __("stop_rain", { "yesNo": yesNo, "options.when": options.when } );
+        output = __("stop_rain", { "yesNo": yesNo, "rainIntensity": rainIntensity, "options.whenRelative": options.whenRelative, "options.when": options.when } );
     } else if (options.speechContains.indexOf("start") > -1 && start == null) {
-        output = __("not_start_rain", { "yesNo": yesNo, "options.when": options.when } );
+        output = __("not_start_rain", { "yesNo": yesNo, "rainIntensity": rainIntensity, "options.whenRelative": options.whenRelative, "options.when": options.when } );
     } else if (options.speechContains.indexOf("stop") > -1 && stop == null && rainAverage > 0) {
-        output = __("not_stop_rain", { "yesNo": yesNo, "options.when": options.when } );
+        output = __("not_stop_rain", { "yesNo": yesNo, "rainIntensity": rainIntensity, "options.whenRelative": options.whenRelative, "options.when": options.when } );
     } else if (rainAverage >= 1) {
         output = __("rain", { "yesNo": yesNo, "rainIntensity": rainIntensity, "options.whenRelative": options.whenRelative, "options.when": options.when } )
     } else if (rainAverage == 0) {
@@ -362,5 +370,5 @@ module.exports.speakWeather = function( options ){
     }
 
     Homey.log("Homey say: " + output);
-    //Homey.manager('speech-output').say( __(output) );
+    Homey.manager('speech-output').say( output );
 };

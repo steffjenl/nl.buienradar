@@ -2,6 +2,7 @@
   "id": "nl.buienradar",
   "version": "1.0.0",
   "compatibility": "0.x || 1.x",
+  "category": "internet",
   "name": {
     "en": "Shower radar",
     "nl": "Buienradar"
@@ -14,6 +15,10 @@
     "name": "Freek Boelders",
     "email": "freek@athom.nl"
   },
+  "images": {
+    "large": "./assets/images/large.jpg",
+    "small": "./assets/images/small.jpg"
+  },
   "dependencies": {
     "request": "*"
   },
@@ -22,6 +27,9 @@
     "homey:manager:speech-input",
     "homey:manager:geolocation"
   ],
+  "dependencies": {
+    "request": "*"
+  },
   "speech": [
     {
       "id": "weather",
@@ -139,6 +147,20 @@
       }
     },
     {
+      "id": "how",
+      "importance": 0.3,
+      "triggers": {
+        "en": [
+          "how",
+          "what"
+        ],
+        "nl": [
+          "hoe",
+          "wat"
+        ]
+      }
+    },
+    {
       "id": "before",
       "importance": 0.3,
       "triggers": {
@@ -218,12 +240,14 @@
         "en": [
           "heavy",
           "heavily",
-          "intense"
+          "intense",
+          "hard"
         ],
         "nl": [
           "zwaar",
           "zware",
-          "intens"
+          "intens",
+          "hard"
         ]
       }
     },

@@ -13,11 +13,13 @@
 	"before": "before",
 	"after": "after",
 	"at": "at",
+	"in": "in",
+	"but": "but",
 	"only_two_hours": "Buienradar can only predict 2 hours in the future, please aks your question within a time frame of 2 hours",
-	"start_rain": "__yesNo__, it will start raining within __options.when__",
-	"stop_rain": "__yesNo__, it will stop raining within __options.when__",
-	"not_start_rain": "__yesNo__, it will not start raining within __options.when__",
-	"not_stop_rain": "__yesNo__, it will not stop raining within __options.when__",
+	"start_rain": "__yesNo__, it will start raining __rainIntensity__ __options.whenRelative__ __options.when__",
+	"stop_rain": "__yesNo__, it will stop raining __rainIntensity__ __options.whenRelative__ __options.when__",
+	"not_start_rain": "__yesNo__, it will not start raining __rainIntensity__ __options.whenRelative__ __options.when__",
+	"not_stop_rain": "__yesNo__, it will not stop raining __rainIntensity__ __options.whenRelative__ __options.when__",
 	"rain": "__yesNo__, there is __rainIntensity__ rain expected __options.whenRelative__ __options.when__",
     "no_rain": "__yesNo__, there is no rain expected __options.whenRelative__ __options.when__"
 }
