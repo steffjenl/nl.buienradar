@@ -20,14 +20,43 @@ module.exports.init = function(){
     setTimeout(function () {
         self.updateWeather( function(difMinute){});
     }, 2000)
-    setInterval(trigger_update.bind(this), 1000 * 10 *5); //1000 * 60 * 5
+    setInterval(trigger_update.bind(this), 300000); //5 minutes
     function trigger_update() {
       self.updateWeather( function(difMinute){});
     };
 
     //Listen for speech triggers
     Homey.manager('speech-input').on('speech', self.onSpeech)
+
+    //Listen for triggers with time involved
+    Homey.manager('flow').on('trigger.raining_in', self.raining_in)
 };
+
+//Check for triggers with time involved
+module.exports.raining_in = function( args, callback) {
+    Homey.log("triggers.raining_in")
+    Homey.log(args);
+    Homey.log(cache);
+
+    var found = false;
+
+    if (args.when != "") {
+        for (var time in cache) {
+            var rainMm = cache[ time ].mm;
+
+            if (time <= parseInt(args.when) && rainMm > 0) {
+                Homey.log("True" + time);
+                found = true;
+            }
+        }
+    }
+
+    if (found == true) {
+        callback(true);
+    } else {
+        callback(false);
+    }
+}
 
 //Listen for speech
 module.exports.onSpeech = function(speech) {
@@ -158,15 +187,10 @@ module.exports.updateWeather = function( callback ) {
             })
         }
 
-        //Change UTC to localtime
-        /*var d = new Date();
-        var offset = (new Date().getTimezoneOffset() / 60) * -1; //offset in hours from UTC
-        var localhours = d.getHours() + offset; */
-
           var request = require('request');
           request('http://gps.buienradar.nl/getrr.php?lat=' + lat + '&lon=' + lon, function (error, response, body) {
           if (!error && response.statusCode == 200) {
-            //var array = "000|15:45,000|15:50,000|15:55,000|16:00,000|16:05,000|16:10,000|16:15,000|16:20,000|16:25,000|16:30,000|16:35,000|16:40,000|16:45,000|16:50,000|16:55,000|17:00,000|17:05,000|17:10,000|17:15,000|17:20,000|17:25,010|17:30,020|17:35,030|17:40,010|17:45";
+            //var array = "000|20:25,000|20:30,000|20:35,000|20:40,000|20:45,000|20:50,000|20:55,050|21:00,000|21:05,000|21:10,000|21:15,000|21:20,000|21:25,000|21:30,000|21:35,000|21:40,000|21:45,000|21:50,000|21:55,000|22:00,000|22:05,000|22:10,000|22:15,000|22:20,000|22:25";
             //var array = array.split(','); //Enable this line again when using testing string instead of the real weather
             var array = body.split('\r\n'); //split into seperate items
 
@@ -204,6 +228,16 @@ module.exports.updateWeather = function( callback ) {
 
                     if (firstEntry !== false) {
                         firstDifMinute = difMinute;
+
+                        var rainMm = parseInt(array2[0]);
+                        if (rainMm > 0){
+                            Homey.log("Trigger rain start");
+                            Homey.manager('flow').trigger('rain_start');
+                        } else if (rainMm == 0){
+                            Homey.log("Trigger rain stop");
+                            Homey.manager('flow').trigger('rain_stop');
+                        }
+
                         firstEntry = false;
                     }
 
@@ -221,6 +255,9 @@ module.exports.updateWeather = function( callback ) {
             }
           }
       }.bind(this));
+    
+    //Check for triggers with time involved
+    Homey.manager('flow').trigger('raining_in');
 };
 
 module.exports.speakWeather = function( options ){
