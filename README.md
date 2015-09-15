@@ -2,18 +2,20 @@
 Turn Homey into your personal shower radar.  
 With this app Homey will know everything about the expected rain within the coming two hours.
 
----
 
-Ask Homey for example:  
+---
+##### Speech triggers: 
+
 "When will it start raining?",  
 "When will it stop raining?",  
 "Is it going to rain in 'x' minutes?",  
 "Do I need to bring an umbrella?"  
 ... and more!
 
----
 
-Trigger a flow when:  
+---
+##### Flow triggers:  
+
 It starts raining:  
 ![](http://i.imgur.com/hkUZZY1.png)
 
