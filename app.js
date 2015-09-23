@@ -1,8 +1,9 @@
 "use strict";
 
 var difMinute;
-var lat;
-var lon;
+var lat = null;
+var lon = null;
+var language;
 var cache;
 var rainInfo = {};
 var specificRainInfo = {};
@@ -14,7 +15,10 @@ module.exports.init = function(){
     Homey.log("Buienradar app started");
 
     //Get location
-    self.getLocation( function( lat, lon ) {} )  //Get the location
+    self.getLocation( function (){})  //Get the location
+
+    //Get language
+    language = Homey.manager( 'i18n' ).getLanguage();
 
     //Update weather after 5 seconds and every 5 minutes
     setTimeout(function () {
@@ -62,94 +66,108 @@ module.exports.raining_in = function( args, callback) {
 module.exports.onSpeech = function(speech) {
         Homey.log("Speech is triggered");
 
-        var spoken_text;
-        var format;
-
         var options = { rain: null,
                         when: null,
                         whenRelative: null,
                         intensity: null,
-                        speechContains: []
+                        speech: speech.transcript
                       };
 
-        speech.triggers.forEach(function(trigger){ //Listen for triggers
+        Homey.log(speech.transcript);
 
-            //Find numbers
-            var numbers = speech.transcript.match(/\d+/);      
-            if( Array.isArray( numbers ) ) {
-              var number = numbers[0];
-                number = parseInt(number);
-                
-              if( !isNaN( number ) ) {
-                if( number > 0 && number <= 120 ) {
-                  options['when'] = number;
-                } else if( number > 120) {
-                  Homey.manager('speech-input').ask( __("only_two_hours"), function( err, result ){
-                     if( err ) {
-                          Homey.error( err );
-                          return;
-                      }
-                      onSpeech(result);
-                  });
+        var s = speech.transcript;
+
+        if (s.indexOf (__("today")) > -1 || s.indexOf(__("tomorrow")) > -1 || s.indexOf(__("morning")) > -1 || s.indexOf(__("afternoon")) > -1 || s.indexOf(__("evening")) > -1) { //If you want to know hours or minutes
+            Homey.manager('speech-input').ask( __("only_two_hours"), function( err, result ){
+                if( err ) {
+                    Homey.error( err );
+                    return;
                 }
-              }
-            }
+                self.onSpeech(result);
+            });
 
-            if ( trigger.id == 'rain' ) {
-                options['rain'] = true;
-            } else if ( trigger.id == 'no') {
-                options['rain'] = false;
-            }
-
-            if ( trigger.id == 'now' ) {
-                options['when'] = 0;
-            } else if ( trigger.id == 'quarter' ) {
-                options['when'] = 15;
-            } else if ( trigger.id == 'half_hours' ) {
-                options['when'] = 30;
-            } else if ( trigger.id == 'hour' ) {
-                options['when'] = 60;
-            } else if ( trigger.id == 'two_hours' ) {
-                options['when'] = 120;
-            }
-
-            if ( trigger.id == 'at' ) {
-                options['whenRelative'] = 'at';
-            } else if (trigger.id == 'before') {
-                options['whenRelative'] = 'before';
-            } else if ( trigger.id == 'after' ) {
-                options['whenRelative'] = 'after';
-            } 
-
-            if ( trigger.id == 'light' ) {
-                options['intensity'] = 0;
-            } else if ( trigger.id == 'moderate' ) {
-                options['intensity'] = 85;
-            } else if ( trigger.id == 'heavy' ) {
-                options['intensity'] = 255;
-            } 
-
-            if ( trigger.id == 'when' ) {
-                options['speechContains'].push.apply(options['speechContains'], ['when']);
-            } else if ( trigger.id == 'how' ) {
-                options['speechContains'].push.apply(options['speechContains'], ['how']);
-            } else if ( trigger.id == 'start' ) {
-                options['speechContains'].push.apply(options['speechContains'], ['start']);
-            } else if ( trigger.id == 'stop' ) {
-                options['speechContains'].push.apply(options['speechContains'], ['stop']);
-            } else if ( trigger.id == 'no' ) {
-                options['speechContains'].push.apply(options['speechContains'], ['no']);
-            } 
-            
-        });
-
-        Homey.log ("spoken_text: " + speech.transcript);
-        if (cache == null) {
-            setTimeout( function() {module.exports.speakWeather( options );}, 5000) //If no weather update yet, what 5 sec
-            Homey.log("Please wait, Homey is getting the buienradar info")
         } else {
-            module.exports.speakWeather( options ); //ask_rain, ask_when
-        }
+            speech.triggers.forEach(function(trigger){ //Listen for triggers
+                if ( trigger.id == 'minute' || trigger.id == 'hour' ) {
+                Homey.log("Trying to find numbers");
+                //Find numbers
+                var numbers = speech.transcript.match(/\d+/);      
+                    if( Array.isArray( numbers ) ) {
+                        var number = numbers[0];
+
+                        if (trigger.id == 'hour') number = parseInt(number) * 60;
+                        number = parseInt(number);
+                        
+                        if( !isNaN( number ) ) {
+                            if( number > 0 && number <= 120 ) {
+                                options['when'] = number;
+                            } else if( number > 120) {
+                                Homey.manager('speech-input').ask( __("only_two_hours"), function( err, result ){
+                                if( err ) {
+                                    Homey.error( err );
+                                    return;
+                                }
+                              self.onSpeech(result);
+                          });
+                        }
+                      }
+                    }
+                };
+
+                if ( trigger.id == 'rain' ) {
+                    options['rain'] = true;
+                } else if ( trigger.id == 'no' || trigger.id == 'dry') {
+                    options['rain'] = false;
+                }
+
+                if ( trigger.id == 'now' ) {
+                    options['when'] = 0;
+                } else if ( trigger.id == 'quarter' ) {
+                    options['when'] = 15;
+                } else if ( trigger.id == 'half_hours' ) {
+                    options['when'] = 30;
+                } else if ( trigger.id == 'hour' ) {
+                    options['when'] = 60;
+                } else if ( trigger.id == 'two_hours' ) {
+                    options['when'] = 120;
+                } else if (s.indexOf (__("going")) > -1 || s.indexOf(__("soon")) > -1 || s.indexOf(__("will")) > -1 || s.indexOf(__("expect")) > -1 || s.indexOf(__("predict")) > -1) {
+                    if (options['when'] == null) options['when'] = 120; //When future en when is empty --> 120 min
+                } else if (options['when'] == null) {
+                    options['when'] = 0; //Default is 0 min
+                }
+
+                if ( trigger.id == 'at' ) {
+                    options['whenRelative'] = 'at';
+                } else if (trigger.id == 'before') {
+                    options['whenRelative'] = 'before';
+                } else if ( trigger.id == 'after' ) {
+                    options['whenRelative'] = 'after';
+                } 
+
+                if ( trigger.id == 'light' ) {
+                    options['intensity'] = 0;
+                } else if ( trigger.id == 'moderate' ) {
+                    options['intensity'] = 85;
+                } else if ( trigger.id == 'heavy' ) {
+                    options['intensity'] = 255;
+                }
+
+                if (language == "en") {
+                    //Englisch gramar stuff
+                } else if (language == "nl") {
+                    //Doe Nederlandse gramatica dingen
+                }
+                
+            });
+
+            Homey.log ("spoken_speech: " + speech.transcript);
+            if (cache == null) {
+                setTimeout( function() {module.exports.speakWeather( options );}, 5000) //If no weather update yet, what 5 sec
+                Homey.log("Please wait, Homey is getting the buienradar info")
+            } else {
+                module.exports.speakWeather( options ); //ask_rain, ask_when
+            }
+        };
 }
 
 //get location
@@ -157,8 +175,10 @@ module.exports.getLocation = function( locationCallback ) {
     Homey.log("Get geolocation");
 
     Homey.manager('geolocation').on('location', function (location) {
-    lat = location.latitude;
-    lon = location.longitude;
+        Homey.log( location );
+        lat = location.latitude;
+        lon = location.longitude;
+        locationCallback(lat, lon);
     } )
 
     Homey.manager('geolocation').getLocation(function(err, location) {
@@ -169,7 +189,6 @@ module.exports.getLocation = function( locationCallback ) {
             Homey.log( location );
             lat = location.latitude;
             lon = location.longitude;
-
             locationCallback(lat, lon);
         }
     });
@@ -190,7 +209,7 @@ module.exports.updateWeather = function( callback ) {
           var request = require('request');
           request('http://gps.buienradar.nl/getrr.php?lat=' + lat + '&lon=' + lon, function (error, response, body) {
           if (!error && response.statusCode == 200) {
-            //var array = "000|20:25,000|20:30,000|20:35,000|20:40,000|20:45,000|20:50,000|20:55,050|21:00,000|21:05,000|21:10,000|21:15,000|21:20,000|21:25,000|21:30,000|21:35,000|21:40,000|21:45,000|21:50,000|21:55,000|22:00,000|22:05,000|22:10,000|22:15,000|22:20,000|22:25";
+            //var array = "010|09:25,020|09:30,030|09:35,040|09:40,050|09:45,060|09:50,070|09:55,080|10:00,090|10:05,000|10:10,000|10:15,000|10:20,000|10:25,000|10:30,000|10:35,000|10:40,000|10:45,000|10:50,000|10:55,000|11:00,000|11:05,000|11:10,000|11:15,000|11:20,000|11:25";
             //var array = array.split(','); //Enable this line again when using testing string instead of the real weather
             var array = body.split('\r\n'); //split into seperate items
 
@@ -213,7 +232,7 @@ module.exports.updateWeather = function( callback ) {
                     var hours = d.getHours();
                     var currentMinute = d.getMinutes();
 
-                    //hours = parseInt(hours) + 2;
+                    hours = parseInt(hours) + 2;
 
                     if (hours == rainHours) {
                         difMinute = rainMinute - currentMinute;
@@ -231,8 +250,9 @@ module.exports.updateWeather = function( callback ) {
 
                         var rainMm = parseInt(array2[0]);
                         if (rainMm > 0){
-                            Homey.log("Trigger rain start");
+                            Homey.log("Trigger rain and raining_in start");
                             Homey.manager('flow').trigger('rain_start');
+                            Homey.manager('flow').trigger('raining_in'); //Check for triggers with time involved
                         } else if (rainMm == 0){
                             Homey.log("Trigger rain stop");
                             Homey.manager('flow').trigger('rain_stop');
@@ -255,9 +275,6 @@ module.exports.updateWeather = function( callback ) {
             }
           }
       }.bind(this));
-    
-    //Check for triggers with time involved
-    Homey.manager('flow').trigger('raining_in');
 };
 
 module.exports.speakWeather = function( options ){
@@ -271,7 +288,8 @@ module.exports.speakWeather = function( options ){
     var stop;
     var found = false;
     var output;
-    var rainIntensity;
+    var rainIntensity = "";
+    var maxIntensity = 0;
     var foundIntensity = false;
     var yesNo;
     var lastObj;
@@ -288,7 +306,18 @@ module.exports.speakWeather = function( options ){
             };
             rainTotal = rainTotal + mm;
             if (mm > 0) rainEntrys = rainEntrys + 1;
+            if (mm > maxIntensity) maxIntensity = mm;
             //Homey.log("not time");
+        } else if (options.when < 0) {
+            if (time < 5) {
+                specificRainInfo[ time ] = {
+                    mm: mm
+                };
+                rainTotal = rainTotal + mm;
+                if (mm > 0) rainEntrys = rainEntrys + 1;
+                if (mm > maxIntensity) maxIntensity = mm;
+                Homey.log("at");
+            }
         } else if (options.whenRelative == 'at' || options.when == 0) {
             if (time == options.when) {
                 specificRainInfo[ time ] = {
@@ -296,6 +325,7 @@ module.exports.speakWeather = function( options ){
                 };
                 rainTotal = rainTotal + mm;
                 if (mm > 0) rainEntrys = rainEntrys + 1;
+                if (mm > maxIntensity) maxIntensity = mm;
                 Homey.log("at");
             }
         } else if (options.whenRelative == 'before' || options.whenRelative == null) { //If before or not defined
@@ -305,6 +335,7 @@ module.exports.speakWeather = function( options ){
                 };
                 rainTotal = rainTotal + mm;
                 if (mm > 0) rainEntrys = rainEntrys + 1;
+                if (mm > maxIntensity) maxIntensity = mm;
                 Homey.log("before");
             }
         } else if (options.whenRelative == 'after') {
@@ -314,6 +345,7 @@ module.exports.speakWeather = function( options ){
                 };
                 rainTotal = rainTotal + mm;
                 if (mm > 0) rainEntrys = rainEntrys + 1;
+                if (mm > maxIntensity) maxIntensity = mm;
                 Homey.log("after");
             }
         }
@@ -354,10 +386,10 @@ module.exports.speakWeather = function( options ){
     if (lastObj == true ) stop = null; //If last entry is rain, the rain is not going to stop
 
     //Determine words for intensity to speakout
-    if (rainAverage == 0) rainIntensity = __("no");
-    if (rainAverage < 85) rainIntensity = __("light");
-    if (rainAverage > 85 && rainAverage < 255) rainIntensity = __("moderate");
-    if (rainAverage > 255) rainIntensity = __("heavy");
+    if (maxIntensity < 85) rainIntensity = __("light");
+    if (maxIntensity> 85 && rainAverage < 255) rainIntensity = __("moderate");
+    if (maxIntensity > 255) rainIntensity = __("heavy");
+    if (maxIntensity == 0) rainIntensity = __("no");
 
     //Normal yes and no
     if (rainAverage == 0) yesNo = __("no");
@@ -369,37 +401,41 @@ module.exports.speakWeather = function( options ){
     if (foundIntensity == true && options.intensity != null) yesNo = __("yes");
     if (foundIntensity == false && options.intensity != null) yesNo = __("no");
 
-    //When the senteces contains a "not" turn the YesNo around
-    if (options.speechContains.indexOf("no") > -1) {if (yesNo == __("yes")){yesNo = __("no")} else if (yesNo == __("no")){yesNo = __("yes")} };
+    if (stop == null && options.speech.indexOf("stop") > -1) yesNo = __("no"); //Rain will not stop
 
-    //Custom words and options for certain questions
-    if (options.speechContains.indexOf("when") > -1 && options.when == null && start != null) options.when = start + " " + __("minutes"); // If speech contains "when" and no certain time and start exists
-    if (options.speechContains.indexOf("when") > -1 && options.speechContains.indexOf("start" && start != null) > -1) options.when = start + " " + __("minutes"); //If speech contains "when" and "start" and start exists
-    if (options.speechContains.indexOf("when") > -1 && options.speechContains.indexOf("stop" && stop != null) > -1) options.when = stop + " " + __("minutes"); //If speech contains "when" and "stop" and stop exists
-    if (options.speechContains.indexOf("when") > -1 || options.speechContains.indexOf("how") > -1) yesNo = ""; //Don't say Yes or No when user asks for when or how
-    
-    if (options.when == null) options.when = '2 ' + __("hours"); 
-    if (options.when < 120) options.when = options.when + " " + __("minutes");
+    //When the senteces contains a "not" turn the YesNo around
+    //if (options.speech.indexOf("not") > -1) {if (yesNo == __("yes")){yesNo = __("no")} else if (yesNo == __("no")){yesNo = __("yes")} };
+
     if (options.when == 120) options.when = '2 ' + __("hours"); 
     if (options.when == 60) options.when = '1 ' + __("hour"); 
-    if (options.when == 1) options.when = options.when + " " + __("minutes"); 
+    if (options.when == 1) options.when = options.when + " " + __("minute"); 
     if (options.when == 0) options.when = __("now");
-    
-    if (options.whenRelative == null && options.speechContains.indexOf("start") > -1 || options.speechContains.indexOf("stop") > -1) options.whenRelative = __("at"); //But if it is start or stop make it at
+    if (options.when < 120) options.when = options.when + " " + __("minutes");
+
+    //Custom words and options for certain questions
+    if (start != null && options.when != __("now")) options.when = start + " " + __("minutes"); //no certain time and start exists
+    if (stop == null && options.speech.indexOf("stop") > -1) options.when = '2 ' + __("hours"); //
+    if (options.speech.indexOf("start" && start != null) > -1) options.when = start + " " + __("minutes"); //"start" and start exists
+    if (options.speech.indexOf("stop" && stop != null) > -1) options.when = stop + " " + __("minutes"); //"stop" and stop exists
+    if (options.speech.indexOf("when") > -1 || options.speech.indexOf("how") > -1) yesNo = ""; //Don't say Yes or No when user asks for when or how
+
+    if (options.whenRelative == null && options.speech.indexOf("start") > -1 || options.speech.indexOf("stop") > -1) options.whenRelative = __("at"); //But if it is start or stop make it at
     if (options.whenRelative == null) options.whenRelative = __("in"); //By default it is in
     if (options.whenRelative == "before") options.whenRelative = __("before"); 
     if (options.whenRelative == "after") options.whenRelative = __("after"); 
     if (options.whenRelative == "at") options.whenRelative = __("in"); //ToDo fix "at" in "in" issue
 
     //Speak one of the sentences
-    if (options.speechContains.indexOf("start") > -1 && start != null) {
+    if (options.speech.indexOf("start") > -1 && start != null) {
         output = __("start_rain", { "yesNo": yesNo, "rainIntensity": rainIntensity, "options.whenRelative": options.whenRelative, "options.when": options.when } );
-    } else if (options.speechContains.indexOf("stop") > -1 && stop != null) {
+    } else if (options.speech.indexOf("stop") > -1 && stop != null) {
         output = __("stop_rain", { "yesNo": yesNo, "rainIntensity": rainIntensity, "options.whenRelative": options.whenRelative, "options.when": options.when } );
-    } else if (options.speechContains.indexOf("start") > -1 && start == null) {
+    } else if (options.speech.indexOf("start") > -1 && start == null) {
         output = __("not_start_rain", { "yesNo": yesNo, "rainIntensity": rainIntensity, "options.whenRelative": options.whenRelative, "options.when": options.when } );
-    } else if (options.speechContains.indexOf("stop") > -1 && stop == null && rainAverage > 0) {
+    } else if (options.speech.indexOf("stop") > -1 && stop == null && rainAverage > 0) {
         output = __("not_stop_rain", { "yesNo": yesNo, "rainIntensity": rainIntensity, "options.whenRelative": options.whenRelative, "options.when": options.when } );
+    } else if (options.when == __("now")) {
+        output = __("rain_now", { "yesNo": yesNo, "rainIntensity": rainIntensity, "options.when": options.when } )
     } else if (rainAverage >= 1) {
         output = __("rain", { "yesNo": yesNo, "rainIntensity": rainIntensity, "options.whenRelative": options.whenRelative, "options.when": options.when } )
     } else if (rainAverage == 0) {
