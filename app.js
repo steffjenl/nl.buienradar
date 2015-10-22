@@ -34,13 +34,15 @@ module.exports.init = function(){
 
     //Listen for triggers with time involved
     Homey.manager('flow').on('trigger.raining_in', self.raining_in)
+
+    //Listen for triggers it is raining
+    Homey.manager('flow').on('condition.is_raining', self.is_raining)
 };
 
 //Check for triggers with time involved
 module.exports.raining_in = function( args, callback) {
     Homey.log("triggers.raining_in")
     Homey.log(args);
-    Homey.log(cache);
 
     var found = false;
 
@@ -49,9 +51,33 @@ module.exports.raining_in = function( args, callback) {
             var rainMm = cache[ time ].mm;
 
             if (time <= parseInt(args.when) && rainMm > 0) {
-                Homey.log("True" + time);
+                //Homey.log("True" + time);
                 found = true;
             }
+        }
+    }
+
+    if (found == true) {
+        callback(true);
+    } else {
+        callback(false);
+    }
+}
+
+//Check for triggers with time involved
+module.exports.is_raining = function( args, callback) {
+    Homey.log("condition.is_raining")
+    Homey.log(args);
+    Homey.log(cache);
+
+    var found = false;
+
+    for (var time in cache) {
+        var rainMm = cache[ time ].mm;
+
+        if (time <= 5 && rainMm > 0) {
+            Homey.log("True" + time);
+            found = true;
         }
     }
 
@@ -209,8 +235,8 @@ module.exports.updateWeather = function( callback ) {
           var request = require('request');
           request('http://gps.buienradar.nl/getrr.php?lat=' + lat + '&lon=' + lon, function (error, response, body) {
           if (!error && response.statusCode == 200) {
-            //var array = "010|09:25,020|09:30,030|09:35,040|09:40,050|09:45,060|09:50,070|09:55,080|10:00,090|10:05,000|10:10,000|10:15,000|10:20,000|10:25,000|10:30,000|10:35,000|10:40,000|10:45,000|10:50,000|10:55,000|11:00,000|11:05,000|11:10,000|11:15,000|11:20,000|11:25";
-            //var array = array.split(','); //Enable this line again when using testing string instead of the real weather
+            //var array = "000|14:05 000|14:10 000|14:15 000|14:20 000|14:25 025|14:30 052|14:35 040|14:40 050|14:45 060|14:50 070|14:55 080|15:00 000|15:05 000|15:10 000|15:15 000|15:20 000|15:25 000|15:30 000|15:35 000|15:40 000|15:45 000|15:50 000|15:55 000|16:00 000|16:05";
+            //var array = array.split(' '); //Enable this line again when using testing string instead of the real weather
             var array = body.split('\r\n'); //split into seperate items
 
             Homey.log ("Array: " + array); //location
@@ -221,48 +247,61 @@ module.exports.updateWeather = function( callback ) {
             var rainEntrys = 0;
             var firstEntry;
             var firstDifMinute;
+            var stop;
+            var start;
 
             for (var i = 2; i < 24; i++) { //get the coming 120 min (ignore first 2 items)
                 var array2 = array[i].split('|'); //split rain and time
-                    var rainMm = parseInt(array2[0]); //Take mm and make it a int
-                    var rainTime = array2[1];
-                    var rainMinute = parseInt(rainTime.substr(rainTime.indexOf(":") + 1));
-                    var rainHours = parseInt(rainTime.substr(rainTime.indexOf(":") - 2, 2));
-                    var d = new Date();
-                    var hours = d.getHours();
-                    var currentMinute = d.getMinutes();
+                var rainMm = parseInt(array2[0]); //Take mm and make it a int
+                var rainTime = array2[1];
+                var rainMinute = parseInt(rainTime.substr(rainTime.indexOf(":") + 1));
+                var rainHours = parseInt(rainTime.substr(rainTime.indexOf(":") - 2, 2));
+                var d = new Date();
+                var hours = d.getHours();
+                var currentMinute = d.getMinutes();
 
-                    hours = parseInt(hours) + 2;
+                //hours = parseInt(hours) + 2; //Disable when not using virtual Homey
 
-                    if (hours == rainHours) {
-                        difMinute = rainMinute - currentMinute;
+                if (hours == rainHours) {
+                    difMinute = rainMinute - currentMinute;
+                }
+                else if (hours + 1 == rainHours) {
+                    difMinute = 60 - currentMinute + rainMinute;
+                } else if (hours + 2 == rainHours) {
+                    difMinute = 120 - currentMinute + rainMinute;
+                }
+
+                if (difMinute < 0) difMinute = 0; //Make a 'int' that is just below 0 a 0
+
+                if (firstEntry !== false) { //Only on the first entry
+                    firstDifMinute = difMinute;
+
+                    var rainMm = parseInt(array2[0]);
+
+                    Homey.log ('start', start);
+                    Homey.log ('stop', stop);
+                    Homey.log ('difMinute', difMinute);
+                    Homey.log ('rainMm', rainMm);
+                    if (rainMm > 0 && start != true){
+                        Homey.log("Trigger rain and raining_in start");
+                        Homey.manager('flow').trigger('rain_start');
+                        //Homey.manager('flow').trigger('raining_in'); //Check for triggers with time involved
+                        start = true;
+                        stop = false;
+                    } else if (rainMm == 0 && stop != true){
+                        Homey.log("Trigger rain stop");
+                        Homey.manager('flow').trigger('rain_stop');
+                        start = false;
+                        stop = true;
+                    } else {
+                        Homey.log("No triggers triggered")
                     }
-                    else if (hours + 1 == rainHours) {
-                        difMinute = 60 - currentMinute + rainMinute;
-                    } else if (hours + 2 == rainHours) {
-                        difMinute = 120 - currentMinute + rainMinute;
-                    }
 
-                    if (difMinute < 0) difMinute = 0; //Make a 'int' that is just below 0 a 0
+                    firstEntry = false;
+                }
 
-                    if (firstEntry !== false) {
-                        firstDifMinute = difMinute;
-
-                        var rainMm = parseInt(array2[0]);
-                        if (rainMm > 0){
-                            Homey.log("Trigger rain and raining_in start");
-                            Homey.manager('flow').trigger('rain_start');
-                            Homey.manager('flow').trigger('raining_in'); //Check for triggers with time involved
-                        } else if (rainMm == 0){
-                            Homey.log("Trigger rain stop");
-                            Homey.manager('flow').trigger('rain_stop');
-                        }
-
-                        firstEntry = false;
-                    }
-
-                    rainTotal = rainTotal + rainMm;
-                    rainEntrys = rainEntrys + 1;
+                rainTotal = rainTotal + rainMm;
+                rainEntrys = rainEntrys + 1;
 
                 var rainMm = parseInt(array2[0]); //Take mm and make it a int
                 var rainTime = array2[1];
@@ -273,6 +312,10 @@ module.exports.updateWeather = function( callback ) {
 
                 cache = rainInfo;
             }
+
+        Homey.manager('flow').trigger('raining_in'); //Check for triggers with time involved
+        Homey.log(cache);
+
           }
       }.bind(this));
 };

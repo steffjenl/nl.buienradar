@@ -906,15 +906,24 @@
     ],
     "conditions": [
       {
+        "id": "is_raining",
+        "title": {
+          "en": "It is raining",
+          "nl": "Het is aan het regenen"
+        }
+      },
+      {
         "id": "rain_start",
         "title": {
-          "en": "It starts raining"
+          "en": "It starts raining",
+          "nl": "Het begint met regenen"
         }
       },
       {
         "id": "rain_stop",
         "title": {
-          "en": "It stops raining"
+          "en": "It stops raining",
+          "nl": "Het stopt met regenen"
         }
       },
       {
