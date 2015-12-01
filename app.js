@@ -24,7 +24,7 @@ module.exports.init = function(){
     setTimeout(function () {
         self.updateWeather( function(difMinute){});
     }, 2000)
-    setInterval(trigger_update.bind(this), 300000); //5 minutes
+    setInterval(trigger_update.bind(this), 300000);
     function trigger_update() {
       self.updateWeather( function(difMinute){});
     };
@@ -40,7 +40,7 @@ module.exports.init = function(){
 };
 
 //Check for triggers with time involved
-module.exports.raining_in = function( args, callback) {
+module.exports.raining_in = function( callback, args) {
     Homey.log("triggers.raining_in")
     Homey.log(args);
 
@@ -65,7 +65,7 @@ module.exports.raining_in = function( args, callback) {
 }
 
 //Check for triggers with time involved
-module.exports.is_raining = function( args, callback) {
+module.exports.is_raining = function( callback, args) {
     Homey.log("condition.is_raining")
     Homey.log(args);
     Homey.log(cache);
