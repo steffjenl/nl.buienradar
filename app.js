@@ -470,19 +470,19 @@ module.exports.speakWeather = function( options ){
 
     //Speak one of the sentences
     if (options.speech.indexOf("start") > -1 && start != null) {
-        output = __("start_rain", { "yesNo": yesNo, "rainIntensity": rainIntensity, "options.whenRelative": options.whenRelative, "options.when": options.when } );
+        output = __("start_rain", { "yesNo": yesNo, "rainIntensity": rainIntensity, "whenRelative": options.whenRelative, "when": options.when } );
     } else if (options.speech.indexOf("stop") > -1 && stop != null) {
-        output = __("stop_rain", { "yesNo": yesNo, "rainIntensity": rainIntensity, "options.whenRelative": options.whenRelative, "options.when": options.when } );
+        output = __("stop_rain", { "yesNo": yesNo, "rainIntensity": rainIntensity, "whenRelative": options.whenRelative, "when": options.when } );
     } else if (options.speech.indexOf("start") > -1 && start == null) {
-        output = __("not_start_rain", { "yesNo": yesNo, "rainIntensity": rainIntensity, "options.whenRelative": options.whenRelative, "options.when": options.when } );
+        output = __("not_start_rain", { "yesNo": yesNo, "rainIntensity": rainIntensity, "whenRelative": options.whenRelative, "when": options.when } );
     } else if (options.speech.indexOf("stop") > -1 && stop == null && rainAverage > 0) {
-        output = __("not_stop_rain", { "yesNo": yesNo, "rainIntensity": rainIntensity, "options.whenRelative": options.whenRelative, "options.when": options.when } );
+        output = __("not_stop_rain", { "yesNo": yesNo, "rainIntensity": rainIntensity, "whenRelative": options.whenRelative, "when": options.when } );
     } else if (options.when == __("now")) {
-        output = __("rain_now", { "yesNo": yesNo, "rainIntensity": rainIntensity, "options.when": options.when } )
+        output = __("rain_now", { "yesNo": yesNo, "rainIntensity": rainIntensity, "when": options.when } )
     } else if (rainAverage >= 1) {
-        output = __("rain", { "yesNo": yesNo, "rainIntensity": rainIntensity, "options.whenRelative": options.whenRelative, "options.when": options.when } )
+        output = __("rain", { "yesNo": yesNo, "rainIntensity": rainIntensity, "whenRelative": options.whenRelative, "when": options.when } )
     } else if (rainAverage == 0) {
-        output = __("no_rain", { "yesNo": yesNo, "options.whenRelative": options.whenRelative, "options.when": options.when } );
+        output = __("no_rain", { "yesNo": yesNo, "whenRelative": options.whenRelative, "when": options.when } );
     }
 
     Homey.log("Homey say: " + output);

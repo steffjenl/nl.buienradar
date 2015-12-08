@@ -29,12 +29,12 @@
 	"predict": "voorspel",
 	"expect": "expect",
 	"only_two_hours": "Buienradar kan alleen voorspellingen 2 uur vooruit doen, vraag alsjeblieft je vraag nog een keer maar dan binnen twee uur",
-	"start_rain": "__yesNo__, het gaat __rainIntensity__ regenen __options.whenRelative__ __options.when__",
-	"stop_rain": "__yesNo__, het gaat stoppen met __rainIntensity__ regenen __options.whenRelative__ __options.when__",
-	"not_start_rain": "__yesNo__, het gaat niet __rainIntensity__ regenen __options.whenRelative__ __options.when__",
-	"not_stop_rain": "__yesNo__, het gaat niet stoppen met __rainIntensity__ regenen __options.whenRelative__ __options.when__",
-	"rain": "__yesNo__, er is __rainIntensity__ regen verwacht __options.whenRelative__ __options.when__",
-    "no_rain": "__yesNo__, er wordt geen regen verwacht __options.whenRelative__ __options.when__",
-    "rain_now": "__yesNo__, er is __rainIntensity__ regen __options.when__",
-    "no_rain_now": "__yesNo__, er is geen regen __options.when__"
+	"start_rain": "__yesNo__, het gaat __rainIntensity__ regenen __whenRelative__ __when__",
+	"stop_rain": "__yesNo__, het gaat stoppen met __rainIntensity__ regenen __whenRelative__ __when__",
+	"not_start_rain": "__yesNo__, het gaat niet __rainIntensity__ regenen __whenRelative__ __when__",
+	"not_stop_rain": "__yesNo__, het gaat niet stoppen met __rainIntensity__ regenen __whenRelative__ __when__",
+	"rain": "__yesNo__, er is __rainIntensity__ regen verwacht __whenRelative__ __when__",
+    "no_rain": "__yesNo__, er wordt geen regen verwacht __whenRelative__ __when__",
+    "rain_now": "__yesNo__, er is __rainIntensity__ regen __when__",
+    "no_rain_now": "__yesNo__, er is geen regen __when__"
 }

@@ -29,12 +29,12 @@
 	"predict": "predict",
 	"expect": "expect",
 	"only_two_hours": "Buienradar can only predict 2 hours in the future, please ask your question within a time frame of 2 hours",
-	"start_rain": "__yesNo__, it will start raining __rainIntensity__ __options.whenRelative__ __options.when__",
-	"stop_rain": "__yesNo__, it will stop raining __rainIntensity__ __options.whenRelative__ __options.when__",
-	"not_start_rain": "__yesNo__, it will not start raining __rainIntensity__ __options.whenRelative__ __options.when__",
-	"not_stop_rain": "__yesNo__, it will not stop raining __rainIntensity__ __options.whenRelative__ __options.when__",
-	"rain": "__yesNo__, there is __rainIntensity__ rain expected __options.whenRelative__ __options.when__",
-    "no_rain": "__yesNo__, there is no rain expected __options.whenRelative__ __options.when__",
-    "rain_now": "__yesNo__, there is __rainIntensity__ rain right __options.when__",
-    "no_rain_now": "__yesNo__, it is not raining right __options.when__"
+	"start_rain": "__yesNo__, it will start raining __rainIntensity__ __whenRelative__ __when__",
+	"stop_rain": "__yesNo__, it will stop raining __rainIntensity__ __whenRelative__ __when__",
+	"not_start_rain": "__yesNo__, it will not start raining __rainIntensity__ __whenRelative__ __when__",
+	"not_stop_rain": "__yesNo__, it will not stop raining __rainIntensity__ __whenRelative__ __when__",
+	"rain": "__yesNo__, there is __rainIntensity__ rain expected __whenRelative__ __when__",
+    "no_rain": "__yesNo__, there is no rain expected __whenRelative__ __when__",
+    "rain_now": "__yesNo__, there is __rainIntensity__ rain right __when__",
+    "no_rain_now": "__yesNo__, it is not raining right __when__"
 }
