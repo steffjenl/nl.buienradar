@@ -1,5 +1,5 @@
-### Shower Radar app for Homey  
-Turn Homey into your personal shower radar.  
+### Buienradar app for Homey  
+Turn Homey into your personal 'buienradar'.  
 With this app Homey will know everything about the expected rain within the coming two hours.
 
 
