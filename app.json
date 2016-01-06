@@ -32,19 +32,20 @@
   "speech": [
     {
       "id": "weather",
-      "importance": 0.6,
+      "importance": false,
       "triggers": {
         "en": [
           "weather"
         ],
         "nl": [
-          "weer"
+          "weer",
+          "weertje"
         ]
       }
     },
     {
       "id": "minute",
-      "importance": 0.6,
+      "importance": false,
       "triggers": {
         "en": [
           "minutes",
@@ -65,13 +66,22 @@
           "shower",
           "showers",
           "raining",
-          "umbrella"
+          "umbrella",
+          "precipitation",
+          "rainfall",
+          "drizzle",
+          "drops"
         ],
         "nl": [
           "regen",
           "regenen",
+          "bui",         
           "buien",
-          "paraplu"
+          "paraplu",
+          "neerslag",
+          "hemelwater",
+          "miezeren",
+          "druppels"
         ]
       }
     },
@@ -92,7 +102,7 @@
     },
     {
       "id": "no",
-      "importance": 0.3,
+      "importance": false,
       "triggers": {
         "en": [
           "no",
@@ -106,7 +116,7 @@
     },
     {
       "id": "stop",
-      "importance": 0.3,
+      "importance": false,
       "triggers": {
         "en": [
           "stop",
@@ -121,7 +131,7 @@
     },
     {
       "id": "start",
-      "importance": 0.3,
+      "importance": false,
       "triggers": {
         "en": [
           "start",
@@ -135,7 +145,7 @@
     },
     {
       "id": "when",
-      "importance": 0.3,
+      "importance": false,
       "triggers": {
         "en": [
           "when",
@@ -149,7 +159,7 @@
     },
     {
       "id": "how",
-      "importance": 0.3,
+      "importance": false,
       "triggers": {
         "en": [
           "how",
@@ -163,7 +173,7 @@
     },
     {
       "id": "before",
-      "importance": 0.3,
+      "importance": false,
       "triggers": {
         "en": [
           "before",
@@ -178,7 +188,7 @@
     },
     {
       "id": "after",
-      "importance": 0.3,
+      "importance": false,
       "triggers": {
         "en": [
           "after",
@@ -192,7 +202,7 @@
     },
     {
       "id": "at",
-      "importance": 0.3,
+      "importance": false,
       "triggers": {
         "en": [
           "at",
@@ -206,7 +216,7 @@
     },
     {
       "id": "light",
-      "importance": 0.3,
+      "importance": false,
       "triggers": {
         "en": [
           "light",
@@ -222,7 +232,7 @@
     },
     {
       "id": "moderate",
-      "importance": 0.3,
+      "importance": false,
       "triggers": {
         "en": [
           "moderate",
@@ -236,7 +246,7 @@
     },
     {
       "id": "heavy",
-      "importance": 0.3,
+      "importance": false,
       "triggers": {
         "en": [
           "heavy",
@@ -254,7 +264,7 @@
     },
     {
       "id": "hour",
-      "importance": 0.3,
+      "importance": false,
       "triggers": {
         "en": [
           "hours",
@@ -268,7 +278,7 @@
     },
     {
       "id": "two_hours",
-      "importance": 0.3,
+      "importance": false,
       "triggers": {
         "en": [
           "two hours",
@@ -282,7 +292,7 @@
     },
     {
       "id": "half-hour",
-      "importance": 0.3,
+      "importance": false,
       "triggers": {
         "en": [
           "half an hour"
@@ -295,7 +305,7 @@
     },
     {
       "id": "quarter",
-      "importance": 0.3,
+      "importance": false,
       "triggers": {
         "en": [
           "quarter"
@@ -308,7 +318,7 @@
     },
     {
       "id": "now",
-      "importance": 0.3,
+      "importance": false,
       "triggers": {
         "en": [
           "now",
@@ -324,7 +334,7 @@
     },
     {
       "id": "0",
-      "importance": 0.01,
+      "importance": false,
       "triggers": {
         "en": [
           "zero"
@@ -336,7 +346,7 @@
     },
     {
       "id": "1",
-      "importance": 0.01,
+      "importance": false,
       "triggers": {
         "en": [
           "one"
@@ -348,7 +358,7 @@
     },
     {
       "id": "2",
-      "importance": 0.01,
+      "importance": false,
       "triggers": {
         "en": [
           "two"
@@ -360,7 +370,7 @@
     },
     {
       "id": "3",
-      "importance": 0.01,
+      "importance": false,
       "triggers": {
         "en": [
           "three"
@@ -372,7 +382,7 @@
     },
     {
       "id": "4",
-      "importance": 0.01,
+      "importance": false,
       "triggers": {
         "en": [
           "four"
@@ -384,7 +394,7 @@
     },
     {
       "id": "5",
-      "importance": 0.01,
+      "importance": false,
       "triggers": {
         "en": [
           "five"
@@ -396,7 +406,7 @@
     },
     {
       "id": "6",
-      "importance": 0.01,
+      "importance": false,
       "triggers": {
         "en": [
           "six"
@@ -408,7 +418,7 @@
     },
     {
       "id": "7",
-      "importance": 0.01,
+      "importance": false,
       "triggers": {
         "en": [
           "seven"
@@ -420,7 +430,7 @@
     },
     {
       "id": "8",
-      "importance": 0.01,
+      "importance": false,
       "triggers": {
         "en": [
           "eight"
@@ -432,7 +442,7 @@
     },
     {
       "id": "9",
-      "importance": 0.01,
+      "importance": false,
       "triggers": {
         "en": [
           "nine"
@@ -444,7 +454,7 @@
     },
     {
       "id": "10",
-      "importance": 0.01,
+      "importance": false,
       "triggers": {
         "en": [
           "ten"
@@ -456,7 +466,7 @@
     },
     {
       "id": "11",
-      "importance": 0.01,
+      "importance": false,
       "triggers": {
         "en": [
           "eleven"
@@ -468,7 +478,7 @@
     },
     {
       "id": "12",
-      "importance": 0.01,
+      "importance": false,
       "triggers": {
         "en": [
           "twelve"
@@ -480,7 +490,7 @@
     },
     {
       "id": "13",
-      "importance": 0.01,
+      "importance": false,
       "triggers": {
         "en": [
           "thirteen"
@@ -492,7 +502,7 @@
     },
     {
       "id": "14",
-      "importance": 0.01,
+      "importance": false,
       "triggers": {
         "en": [
           "fourteen"
@@ -504,7 +514,7 @@
     },
     {
       "id": "15",
-      "importance": 0.01,
+      "importance": false,
       "triggers": {
         "en": [
           "fifteen"
@@ -516,7 +526,7 @@
     },
     {
       "id": "16",
-      "importance": 0.01,
+      "importance": false,
       "triggers": {
         "en": [
           "sixteen"
@@ -528,7 +538,7 @@
     },
     {
       "id": "17",
-      "importance": 0.01,
+      "importance": false,
       "triggers": {
         "en": [
           "seventeen"
@@ -540,7 +550,7 @@
     },
     {
       "id": "18",
-      "importance": 0.01,
+      "importance": false,
       "triggers": {
         "en": [
           "eighteen"
@@ -552,7 +562,7 @@
     },
     {
       "id": "19",
-      "importance": 0.01,
+      "importance": false,
       "triggers": {
         "en": [
           "nineteen"
@@ -564,7 +574,7 @@
     },
     {
       "id": "20",
-      "importance": 0.01,
+      "importance": false,
       "triggers": {
         "en": [
           "twenty"
@@ -576,7 +586,7 @@
     },
     {
       "id": "21",
-      "importance": 0.01,
+      "importance": false,
       "triggers": {
         "en": [
           "twenty-one"
@@ -588,7 +598,7 @@
     },
     {
       "id": "22",
-      "importance": 0.01,
+      "importance": false,
       "triggers": {
         "en": [
           "twenty-two"
@@ -600,7 +610,7 @@
     },
     {
       "id": "23",
-      "importance": 0.01,
+      "importance": false,
       "triggers": {
         "en": [
           "twenty-three"
@@ -612,7 +622,7 @@
     },
     {
       "id": "24",
-      "importance": 0.01,
+      "importance": false,
       "triggers": {
         "en": [
           "twenty-four"
@@ -624,7 +634,7 @@
     },
     {
       "id": "25",
-      "importance": 0.01,
+      "importance": false,
       "triggers": {
         "en": [
           "twenty-five"
@@ -636,7 +646,7 @@
     },
     {
       "id": "26",
-      "importance": 0.01,
+      "importance": false,
       "triggers": {
         "en": [
           "twenty-six"
@@ -648,7 +658,7 @@
     },
     {
       "id": "27",
-      "importance": 0.01,
+      "importance": false,
       "triggers": {
         "en": [
           "twenty-seven"
@@ -660,7 +670,7 @@
     },
     {
       "id": "28",
-      "importance": 0.01,
+      "importance": false,
       "triggers": {
         "en": [
           "twenty-eight"
@@ -672,7 +682,7 @@
     },
     {
       "id": "29",
-      "importance": 0.01,
+      "importance": false,
       "triggers": {
         "en": [
           "twenty-nine"
@@ -684,7 +694,7 @@
     },
     {
       "id": "30",
-      "importance": 0.01,
+      "importance": false,
       "triggers": {
         "en": [
           "thirty"
@@ -696,7 +706,7 @@
     },
     {
       "id": "40",
-      "importance": 0.01,
+      "importance": false,
       "triggers": {
         "en": [
           "fourthy"
@@ -708,7 +718,7 @@
     },
     {
       "id": "45",
-      "importance": 0.01,
+      "importance": false,
       "triggers": {
         "en": [
           "fourthy-five"
@@ -720,7 +730,7 @@
     },
     {
       "id": "50",
-      "importance": 0.01,
+      "importance": false,
       "triggers": {
         "en": [
           "fifty"
@@ -732,7 +742,7 @@
     },
     {
       "id": "60",
-      "importance": 0.01,
+      "importance": false,
       "triggers": {
         "en": [
           "sixty"
@@ -744,7 +754,7 @@
     },
     {
       "id": "70",
-      "importance": 0.01,
+      "importance": false,
       "triggers": {
         "en": [
           "seventy"
@@ -756,7 +766,7 @@
     },
     {
       "id": "80",
-      "importance": 0.01,
+      "importance": false,
       "triggers": {
         "en": [
           "eighty"
@@ -768,7 +778,7 @@
     },
     {
       "id": "90",
-      "importance": 0.01,
+      "importance": false,
       "triggers": {
         "en": [
           "ninety"
@@ -780,7 +790,7 @@
     },
     {
       "id": "100",
-      "importance": 0.01,
+      "importance": false,
       "triggers": {
         "en": [
           "hunderd"
@@ -792,7 +802,7 @@
     },
     {
       "id": "110",
-      "importance": 0.01,
+      "importance": false,
       "triggers": {
         "en": [
           "hunderd ten"
@@ -804,7 +814,7 @@
     },
     {
       "id": "120",
-      "importance": 0.01,
+      "importance": false,
       "triggers": {
         "en": [
           "hunder twenty"
