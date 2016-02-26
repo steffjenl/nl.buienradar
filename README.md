@@ -9,7 +9,7 @@ With this app Homey will know everything about the expected rain within the comi
 "When will it start raining?",  
 "When will it stop raining?",  
 "Is it going to rain in 'x' minutes?",  
-"Do I need to bring an umbrella?"  
+"Is it raining right now?"  
 ... and more!
 
 

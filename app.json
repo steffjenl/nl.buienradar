@@ -1,6 +1,6 @@
 {
   "id": "nl.buienradar",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "compatibility": "0.x || 1.x",
   "category": "internet",
   "name": {
@@ -32,7 +32,7 @@
   "speech": [
     {
       "id": "weather",
-      "importance": false,
+      "importance": 0.5,
       "triggers": {
         "en": [
           "weather"
