@@ -86,104 +86,108 @@ var self = {
 
     //Listen for speech
     onSpeech: function(speech) {
-        Homey.log("Speech is triggered:", speech);
-
-        var options = { rain: null,
-                        when: null,
-                        whenRelative: null,
-                        intensity: null,
-                        speech: speech.transcript
-                      };
-
-        Homey.log(speech.transcript);
-
-        var s = speech.transcript;
-
-        if (s.indexOf (__("today")) > -1 || s.indexOf(__("tomorrow")) > -1 || s.indexOf(__("morning")) > -1 || s.indexOf(__("afternoon")) > -1 || s.indexOf(__("evening")) > -1) { //If you want to know hours or minutes
-            Homey.manager('speech-input').ask( __("only_two_hours"), function( err, result ){
-                if( err ) {
-                    Homey.error( err );
-                    return;
-                }
-                self.onSpeech(result);
-            });
-
+        if( !speech ) { 
+            throw new Error('No speech object available');
         } else {
-            speech.triggers.forEach(function(trigger){ //Listen for triggers
-                if ( trigger.id == 'minute' || trigger.id == 'hour' ) {
-                Homey.log("Trying to find numbers");
-                //Find numbers
-                var numbers = speech.transcript.match(/\d+/);      
-                    if( Array.isArray( numbers ) ) {
-                        var number = numbers[0];
+            Homey.log("Speech is triggered:", speech);
 
-                        if (trigger.id == 'hour') number = parseInt(number) * 60;
-                        number = parseInt(number);
-                        
-                        if( !isNaN( number ) ) {
-                            if( number > 0 && number <= 120 ) {
-                                options['when'] = number;
-                            } else if( number > 120) {
-                                Homey.manager('speech-input').ask( __("only_two_hours"), function( err, result ){
-                                if( err ) {
-                                    Homey.error( err );
-                                    return;
-                                }
-                              self.onSpeech(result);
-                          });
-                        }
-                      }
+            var options = { rain: null,
+                            when: null,
+                            whenRelative: null,
+                            intensity: null,
+                            speech: speech.transcript
+                          };
+
+            Homey.log(speech.transcript);
+
+            var s = speech.transcript;
+
+            if (s.indexOf (__("today")) > -1 || s.indexOf(__("tomorrow")) > -1 || s.indexOf(__("morning")) > -1 || s.indexOf(__("afternoon")) > -1 || s.indexOf(__("evening")) > -1) { //If you want to know hours or minutes
+                Homey.manager('speech-input').ask( __("only_two_hours"), function( err, result ){
+                    if( err ) {
+                        Homey.error( err );
+                        return;
                     }
-                };
+                    self.onSpeech(result);
+                });
 
-                if ( trigger.id == 'rain' ) {
-                    options['rain'] = true;
-                } else if ( trigger.id == 'no' || trigger.id == 'dry') {
-                    options['rain'] = false;
-                }
-
-                if ( trigger.id == 'now' ) {
-                    options['when'] = 0;
-                } else if ( trigger.id == 'quarter' ) {
-                    options['when'] = 15;
-                } else if ( trigger.id == 'half_hours' ) {
-                    options['when'] = 30;
-                } else if ( trigger.id == 'hour' ) {
-                    options['when'] = 60;
-                } else if ( trigger.id == 'two_hours' ) {
-                    options['when'] = 120;
-                } else if (s.indexOf (__("going")) > -1 || s.indexOf(__("soon")) > -1 || s.indexOf(__("will")) > -1 || s.indexOf(__("expect")) > -1 || s.indexOf(__("predict")) > -1) {
-                    if (options['when'] == null) options['when'] = 120; //When future en when is empty --> 120 min
-                } else if (options['when'] == null) {
-                    options['when'] = 0; //Default is 0 min
-                }
-
-                if ( trigger.id == 'at' ) {
-                    options['whenRelative'] = 'at';
-                } else if (trigger.id == 'before') {
-                    options['whenRelative'] = 'before';
-                } else if ( trigger.id == 'after' ) {
-                    options['whenRelative'] = 'after';
-                } 
-
-                if ( trigger.id == 'light' ) {
-                    options['intensity'] = 0;
-                } else if ( trigger.id == 'moderate' ) {
-                    options['intensity'] = 85;
-                } else if ( trigger.id == 'heavy' ) {
-                    options['intensity'] = 255;
-                }
-                
-            });
-
-            Homey.log ("spoken_speech: " + speech.transcript);
-            if (cache == null) {
-                setTimeout( function() {self.speakWeather( options );}, 5000) //If no weather update yet, what 5 sec
-                Homey.log("Please wait, Homey is getting the buienradar info")
             } else {
-                self.speakWeather( options ); //ask_rain, ask_when
-            }
-        };
+                speech.triggers.forEach(function(trigger){ //Listen for triggers
+                    if ( trigger.id == 'minute' || trigger.id == 'hour' ) {
+                    Homey.log("Trying to find numbers");
+                    //Find numbers
+                    var numbers = speech.transcript.match(/\d+/);      
+                        if( Array.isArray( numbers ) ) {
+                            var number = numbers[0];
+
+                            if (trigger.id == 'hour') number = parseInt(number) * 60;
+                            number = parseInt(number);
+                            
+                            if( !isNaN( number ) ) {
+                                if( number > 0 && number <= 120 ) {
+                                    options['when'] = number;
+                                } else if( number > 120) {
+                                    Homey.manager('speech-input').ask( __("only_two_hours"), function( err, result ){
+                                    if( err ) {
+                                        Homey.error( err );
+                                        return;
+                                    }
+                                  self.onSpeech(result);
+                              });
+                            }
+                          }
+                        }
+                    };
+
+                    if ( trigger.id == 'rain' ) {
+                        options['rain'] = true;
+                    } else if ( trigger.id == 'no' || trigger.id == 'dry') {
+                        options['rain'] = false;
+                    }
+
+                    if ( trigger.id == 'now' ) {
+                        options['when'] = 0;
+                    } else if ( trigger.id == 'quarter' ) {
+                        options['when'] = 15;
+                    } else if ( trigger.id == 'half_hours' ) {
+                        options['when'] = 30;
+                    } else if ( trigger.id == 'hour' ) {
+                        options['when'] = 60;
+                    } else if ( trigger.id == 'two_hours' ) {
+                        options['when'] = 120;
+                    } else if (s.indexOf (__("going")) > -1 || s.indexOf(__("soon")) > -1 || s.indexOf(__("will")) > -1 || s.indexOf(__("expect")) > -1 || s.indexOf(__("predict")) > -1) {
+                        if (options['when'] == null) options['when'] = 120; //When future en when is empty --> 120 min
+                    } else if (options['when'] == null) {
+                        options['when'] = 0; //Default is 0 min
+                    }
+
+                    if ( trigger.id == 'at' ) {
+                        options['whenRelative'] = 'at';
+                    } else if (trigger.id == 'before') {
+                        options['whenRelative'] = 'before';
+                    } else if ( trigger.id == 'after' ) {
+                        options['whenRelative'] = 'after';
+                    } 
+
+                    if ( trigger.id == 'light' ) {
+                        options['intensity'] = 0;
+                    } else if ( trigger.id == 'moderate' ) {
+                        options['intensity'] = 85;
+                    } else if ( trigger.id == 'heavy' ) {
+                        options['intensity'] = 255;
+                    }
+                    
+                });
+
+                Homey.log ("spoken_speech: " + speech.transcript);
+                if (cache == null) {
+                    setTimeout( function() {self.speakWeather( options );}, 5000) //If no weather update yet, what 5 sec
+                    Homey.log("Please wait, Homey is getting the buienradar info")
+                } else {
+                    self.speakWeather( options ); //ask_rain, ask_when
+                }
+            };
+        }
     },
 
     //get location
@@ -227,9 +231,9 @@ var self = {
             if (!error && response.statusCode == 200) {
                 //var array = "000|14:05 000|14:10 000|14:15 000|14:20 000|14:25 025|14:30 052|14:35 040|14:40 050|14:45 060|14:50 070|14:55 080|15:00 000|15:05 000|15:10 000|15:15 000|15:20 000|15:25 000|15:30 000|15:35 000|15:40 000|15:45 000|15:50 000|15:55 000|16:00 000|16:05";
                 //var array = array.split(' '); //Enable this line again when using testing string instead of the real weather
-                var array = body.split('\r\n'); //split into seperate items
+                var dataArray = body.split('\r\n'); //split into seperate items
 
-                Homey.log ("Array: " + array); //location
+                Homey.log ("dataArray: " + dataArray); //location
 
                 var rain_found;
                 var rainTotal = 0;
@@ -241,11 +245,17 @@ var self = {
                 var start;
 
                 for (var i = 2; i < 24; i++) { //get the coming 120 min (ignore first 2 items)
-                    var array2 = array[i].split('|'); //split rain and time
-                    var rainMm = parseInt(array2[0]); //Take mm and make it a int
-                    var rainTime = array2[1];
-                    var rainMinute = parseInt(rainTime.substr(rainTime.indexOf(":") + 1));
-                    var rainHours = parseInt(rainTime.substr(rainTime.indexOf(":") - 2, 2));
+                    var rainAndTime = dataArray[i].split('|'); //split rain and time
+                    var rainMm = parseInt(rainAndTime[0]); //Take mm and make it a int
+                    var rainTime = rainAndTime[1];
+                    var rainMinute;
+                    var rainHours;
+
+                    if (rainTime) {
+                        rainMinute = parseInt(rainTime.substr(rainTime.indexOf(":") + 1));
+                        rainHours = parseInt(rainTime.substr(rainTime.indexOf(":") - 2, 2));
+                    }
+
                     var d = new Date();
                     var hours = d.getHours();
                     var currentMinute = d.getMinutes();
@@ -263,8 +273,6 @@ var self = {
                     if (firstEntry !== false) { //Only on the first entry
                         firstDifMinute = difMinute;
 
-                        var rainMm = parseInt(array2[0]);
-
                         Homey.log ('start', start);
                         Homey.log ('stop', stop);
                         Homey.log ('difMinute', difMinute);
@@ -278,7 +286,6 @@ var self = {
                             stop = false;
                         } else if (rainMm == 0 && stop != true){
                             Homey.log("Trigger rain stop");
-                            Homey.log("FOO3");
                             Homey.manager('flow').trigger('rain_stop');
                             start = false;
                             stop = true;
@@ -291,9 +298,6 @@ var self = {
 
                     rainTotal = rainTotal + rainMm;
                     rainEntrys = rainEntrys + 1;
-
-                    var rainMm = parseInt(array2[0]); //Take mm and make it a int
-                    var rainTime = array2[1];
 
                     rainInfo[ difMinute ] = { //Extend the existing rainInfo object with the new content
                         mm: rainMm
