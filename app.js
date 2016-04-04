@@ -14,22 +14,22 @@ var self = {
         Homey.log("Buienradar app started");
 
         //Get location
-        self.getLocation( function (){})  //Get the location
-
-        //Update weather after 5 seconds and every 5 minutes
-        setTimeout(function () {
+        self.getLocation( function ( result ){
+            //Update weather after 5 seconds and every 5 minutes
             self.updateWeather( function(difMinute){});
-        }, 2000)
-        setInterval(trigger_update.bind(this), 300000);
-        function trigger_update() {
-          self.updateWeather( function(difMinute){});
-        };
+
+            setInterval(trigger_update.bind(this), 300000);
+            function trigger_update() {
+              self.updateWeather( function(difMinute){});
+            };
+        })
 
         //Listen for speech triggers
         Homey.manager('speech-input').on('speech', self.onSpeech)
 
         //Listen for triggers with time involved
         Homey.manager('flow').on('trigger.raining_in', self.raining_in)
+        Homey.manager('flow').on('condition.raining_in', self.raining_in)
 
         //Listen for triggers it is raining
         Homey.manager('flow').on('condition.is_raining', self.is_raining)
@@ -54,9 +54,9 @@ var self = {
         }
 
         if (found == true) {
-            callback(true);
+            callback(null, true);
         } else {
-            callback(false);
+            callback(null, false);
         }
     },
 
@@ -78,9 +78,9 @@ var self = {
         }
 
         if (found == true) {
-            callback(true);
+            callback(null, true);
         } else {
-            callback(false);
+            callback(null, false);
         }
     },
 
@@ -100,8 +100,10 @@ var self = {
 
             Homey.log(speech.transcript);
 
+            var umbrella;
             var s = speech.transcript;
 
+            // Only available for coming 2 hours
             if (s.indexOf (__("today")) > -1 || s.indexOf(__("tomorrow")) > -1 || s.indexOf(__("morning")) > -1 || s.indexOf(__("afternoon")) > -1 || s.indexOf(__("evening")) > -1) { //If you want to know hours or minutes
                 Homey.manager('speech-input').ask( __("only_two_hours"), function( err, result ){
                     if( err ) {
@@ -113,29 +115,36 @@ var self = {
 
             } else {
                 speech.triggers.forEach(function(trigger){ //Listen for triggers
-                    if ( trigger.id == 'minute' || trigger.id == 'hour' ) {
-                    Homey.log("Trying to find numbers");
-                    //Find numbers
-                    var numbers = speech.transcript.match(/\d+/);      
-                        if( Array.isArray( numbers ) ) {
-                            var number = numbers[0];
 
-                            if (trigger.id == 'hour') number = parseInt(number) * 60;
-                            number = parseInt(number);
-                            
-                            if( !isNaN( number ) ) {
-                                if( number > 0 && number <= 120 ) {
-                                    options['when'] = number;
-                                } else if( number > 120) {
-                                    Homey.manager('speech-input').ask( __("only_two_hours"), function( err, result ){
-                                    if( err ) {
-                                        Homey.error( err );
-                                        return;
-                                    }
-                                  self.onSpeech(result);
-                              });
+                    if ( trigger.id == 'umbrella' ) {
+                        self.umbrella(trigger);
+                        umbrella = true;
+                    }
+
+                    if ( trigger.id == 'minute' || trigger.id == 'hour' ) {
+                        Homey.log("Trying to find numbers");
+                        
+                        //Find numbers
+                        var numbers = speech.transcript.match(/\d+/);      
+                            if( Array.isArray( numbers ) ) {
+                                var number = numbers[0];
+
+                                if (trigger.id == 'hour') number = parseInt(number) * 60;
+                                number = parseInt(number);
+                                
+                                if( !isNaN( number ) ) {
+                                    if( number > 0 && number <= 120 ) {
+                                        options['when'] = number;
+                                    } else if( number > 120) {
+                                        Homey.manager('speech-input').ask( __("only_two_hours"), function( err, result ){
+                                        if( err ) {
+                                            Homey.error( err );
+                                            return;
+                                        }
+                                        self.onSpeech(result);
+                                    });
+                                }
                             }
-                          }
                         }
                     };
 
@@ -183,7 +192,7 @@ var self = {
                 if (cache == null) {
                     setTimeout( function() {self.speakWeather( options );}, 5000) //If no weather update yet, what 5 sec
                     Homey.log("Please wait, Homey is getting the buienradar info")
-                } else {
+                } else if (!umbrella) {
                     self.speakWeather( options ); //ask_rain, ask_when
                 }
             };
@@ -191,14 +200,13 @@ var self = {
     },
 
     //get location
-    getLocation: function( locationCallback ) {
+    getLocation: function( callback ) {
         Homey.log("Get geolocation");
 
         Homey.manager('geolocation').on('location', function (location) {
             Homey.log( location );
             lat = location.latitude;
             lon = location.longitude;
-            locationCallback(lat, lon);
         } )
 
         Homey.manager('geolocation').getLocation(function(err, location) {
@@ -209,7 +217,7 @@ var self = {
                 Homey.log( location );
                 lat = location.latitude;
                 lon = location.longitude;
-                locationCallback(lat, lon);
+                callback(lat, lon);
             }
         });
     },
@@ -478,6 +486,24 @@ var self = {
 
         Homey.log("Homey say: " + output);
         Homey.manager('speech-output').say( output );
+    },
+
+    umbrella: function(trigger) {
+        self.raining_in(function(err, result) {
+            console.log(arguments);
+            console.log('result', result);
+            console.log(trigger);
+            console.log(trigger.text);
+            var output;
+
+            if (result == true) {
+                output = __("umbrella", { "triggerText": trigger.text } );
+            } else if (result == false) {
+                output = __("no_umbrella", { "triggerText": trigger.text } );
+            }
+            Homey.manager('speech-output').say( output );
+            console.log("This is the output", output);
+        }, "120")
     }
 }
 

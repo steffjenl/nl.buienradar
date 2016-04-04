@@ -2,7 +2,7 @@
 	"yes": "yes",
 	"no": "no",
 	"light": "light",
-	"moderate": "moderate",
+	"moderate": "moderately",
 	"heavy": "heavy",
 	"hour": "hour",
 	"hours": "hours",
@@ -36,5 +36,7 @@
 	"rain": "__yesNo__, there is __rainIntensity__ rain expected __whenRelative__ __when__",
     "no_rain": "__yesNo__, there is no rain expected __whenRelative__ __when__",
     "rain_now": "__yesNo__, there is __rainIntensity__ rain right __when__",
-    "no_rain_now": "__yesNo__, it is not raining right __when__"
+    "no_rain_now": "__yesNo__, it is not raining right __when__",
+    "umbrella": "Yes, please bring your __triggerText__, it is going to rain within the coming 2 hours.",
+    "no_umbrella": "No, you don't have to bring your __triggerText__, it will stay dry the coming 2 hours."
 }

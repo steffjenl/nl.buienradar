@@ -31,19 +31,6 @@
   },
   "speech": [
     {
-      "id": "weather",
-      "importance": 0.5,
-      "triggers": {
-        "en": [
-          "weather"
-        ],
-        "nl": [
-          "weer",
-          "weertje"
-        ]
-      }
-    },
-    {
       "id": "minute",
       "importance": false,
       "triggers": {
@@ -66,7 +53,6 @@
           "shower",
           "showers",
           "raining",
-          "umbrella",
           "precipitation",
           "rainfall",
           "drizzle",
@@ -77,7 +63,6 @@
           "regenen",
           "bui",         
           "buien",
-          "paraplu",
           "neerslag",
           "hemelwater",
           "miezeren",
@@ -97,6 +82,26 @@
           "droog",
           "stop de regen",
           "stopt het met regenen"
+        ]
+      }
+    },
+    {
+      "id": "umbrella",
+      "importance": 0.9,
+      "triggers": {
+        "en": [
+          "umbrella",
+          "umbrellas",
+          "rain cloths",
+          "rain coat"
+        ],
+        "nl": [
+          "paraplu",
+          "paraplu's",
+          "parapluutje",
+          "parapluutjes",
+          "regen kleren",
+          "regenjas"
         ]
       }
     },
@@ -917,29 +922,15 @@
       {
         "id": "is_raining",
         "title": {
-          "en": "It is raining",
-          "nl": "Het is aan het regenen"
-        }
-      },
-      {
-        "id": "rain_start",
-        "title": {
-          "en": "It starts raining",
-          "nl": "Het begint met regenen"
-        }
-      },
-      {
-        "id": "rain_stop",
-        "title": {
-          "en": "It stops raining",
-          "nl": "Het stopt met regenen"
+          "en": "It !{{is|isn't}} raining",
+          "nl": "Het !{{is|is niet}} aan het regenen"
         }
       },
       {
         "id": "raining_in",
         "title": {
-          "en": "It is going to rain in...",
-          "nl": "Het gaat regenen in..."
+          "en": "It !{{is|isn't}} going to rain in...",
+          "nl": "Het !{{gaat|gaat niet}} regenen in..."
         },
         "args": [
           {

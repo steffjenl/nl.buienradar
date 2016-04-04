@@ -36,5 +36,7 @@
 	"rain": "__yesNo__, er is __rainIntensity__ regen verwacht __whenRelative__ __when__",
     "no_rain": "__yesNo__, er wordt geen regen verwacht __whenRelative__ __when__",
     "rain_now": "__yesNo__, er is __rainIntensity__ regen __when__",
-    "no_rain_now": "__yesNo__, er is geen regen __when__"
+    "no_rain_now": "__yesNo__, er is geen regen __when__",
+    "umbrella": "Ja, het is handig als je een __triggerText__ meeneemt, het gaat namelijk regenen binnen de komende twee uren.",
+    "no_umbrella": "Nee, je hoeft geen __triggerText__ mee te nemen, het blijft namelijk droog de komende twee uren."
 }
