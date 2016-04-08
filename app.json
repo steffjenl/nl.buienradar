@@ -96,6 +96,7 @@
         "nl": [
           "droog",
           "stop de regen",
+          "stopt de regen",
           "stopt het met regenen"
         ]
       }
@@ -139,7 +140,9 @@
         ],
         "nl": [
           "starten",
-          "beginnen"
+          "beginnen",
+          "start",
+          "begint"
         ]
       }
     },
@@ -153,7 +156,8 @@
         ],
         "nl": [
           "wanneer",
-          "op welke tijd"
+          "op welke tijd",
+          "hoe laat"
         ]
       }
     },
@@ -226,7 +230,9 @@
         "nl": [
           "licht",
           "lichte",
-          "miezeren"
+          "miezeren",
+          "iets",
+          "een beetje"
         ]
       }
     },
@@ -258,7 +264,9 @@
           "zwaar",
           "zware",
           "intens",
-          "hard"
+          "hard",
+          "stevig",
+          "flink"
         ]
       }
     },
@@ -328,7 +336,8 @@
         ],
         "nl": [
           "nu",
-          "op het moment"
+          "op het moment",
+          "momenteel"
         ]
       }
     },
@@ -793,7 +802,7 @@
       "importance": false,
       "triggers": {
         "en": [
-          "hunderd"
+          "hundred"
         ],
         "nl": [
           "honderd"
@@ -805,7 +814,7 @@
       "importance": false,
       "triggers": {
         "en": [
-          "hunderd ten"
+          "hundred ten"
         ],
         "nl": [
           "honderdtien"
@@ -817,7 +826,7 @@
       "importance": false,
       "triggers": {
         "en": [
-          "hunder twenty"
+          "hundred twenty"
         ],
         "nl": [
           "honderdtwintig"
@@ -845,7 +854,7 @@
         "id": "raining_in",
         "title": {
           "en": "It is going to rain in...",
-          "nl": "Het gaat regenen in..."
+          "nl": "Het gaat regenen over..."
         },
         "args": [
           {
@@ -939,7 +948,7 @@
         "id": "raining_in",
         "title": {
           "en": "It is going to rain in...",
-          "nl": "Het gaat regenen in..."
+          "nl": "Het gaat regenen over..."
         },
         "args": [
           {
