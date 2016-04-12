@@ -105,7 +105,7 @@ var self = {
 
             // Only available for coming 2 hours
             if (s.indexOf (__("today")) > -1 || s.indexOf(__("tomorrow")) > -1 || s.indexOf(__("morning")) > -1 || s.indexOf(__("afternoon")) > -1 || s.indexOf(__("evening")) > -1) { //If you want to know hours or minutes
-                Homey.manager('speech-input').ask( __("only_two_hours"), function( err, result ){
+                Homey.manager('speech-input').say( __("only_two_hours"), function( err, result ){
                     if( err ) {
                         Homey.error( err );
                         return;

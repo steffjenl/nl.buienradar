@@ -3,7 +3,6 @@ Turn Homey into your personal 'buienradar'.
 With this app Homey will know everything about the expected rain within the coming two hours.
 
 
----
 ##### Speech triggers: 
 
 "When will it start raining?",  
@@ -14,7 +13,6 @@ With this app Homey will know everything about the expected rain within the comi
 ... and more!
 
 
----
 ##### Flow triggers:  
 
 It starts raining:  
