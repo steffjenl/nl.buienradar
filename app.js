@@ -5,6 +5,7 @@ var lat = null;
 var lon = null;
 var language;
 var cache;
+var outOfScope;
 var rainInfo = {};
 var specificRainInfo = {};
 
@@ -105,13 +106,7 @@ var self = {
 
             // Only available for coming 2 hours
             if (s.indexOf (__("today")) > -1 || s.indexOf(__("tomorrow")) > -1 || s.indexOf(__("morning")) > -1 || s.indexOf(__("afternoon")) > -1 || s.indexOf(__("evening")) > -1) { //If you want to know hours or minutes
-                Homey.manager('speech-input').say( __("only_two_hours"), function( err, result ){
-                    if( err ) {
-                        Homey.error( err );
-                        return;
-                    }
-                    self.onSpeech(result);
-                });
+                Homey.manager('speech-output').say( __("only_two_hours") );
 
             } else {
                 speech.triggers.forEach(function(trigger){ //Listen for triggers
@@ -126,27 +121,24 @@ var self = {
                         
                         //Find numbers
                         var numbers = speech.transcript.match(/\d+/);      
-                            if( Array.isArray( numbers ) ) {
-                                var number = numbers[0];
+                        if( Array.isArray( numbers ) ) {
+                            var number = numbers[0];
 
-                                if (trigger.id == 'hour') number = parseInt(number) * 60;
-                                number = parseInt(number);
-                                
-                                if( !isNaN( number ) ) {
-                                    if( number > 0 && number <= 120 ) {
-                                        options['when'] = number;
-                                    } else if( number > 120) {
-                                        Homey.manager('speech-input').ask( __("only_two_hours"), function( err, result ){
-                                        if( err ) {
-                                            Homey.error( err );
-                                            return;
-                                        }
-                                        self.onSpeech(result);
-                                    });
+                            if (trigger.id == 'hour') number = parseInt(number) * 60;
+                            number = parseInt(number);
+                            
+                            if( !isNaN( number ) ) {
+                                if( number > 0 && number <= 120 ) {
+                                    options['when'] = number;
+                                    outOfScope = false;
+                                } else if( number > 120) {
+                                    Homey.manager('speech-output').say( __("only_two_hours") );
+                                    outOfScope = true;
+                                    return;
                                 }
                             }
                         }
-                    };
+                    }
 
                     if ( trigger.id == 'rain' ) {
                         options['rain'] = true;
@@ -192,7 +184,7 @@ var self = {
                 if (cache == null) {
                     setTimeout( function() {self.speakWeather( options );}, 5000) //If no weather update yet, what 5 sec
                     Homey.log("Please wait, Homey is getting the buienradar info")
-                } else if (!umbrella) {
+                } else if (!umbrella && !outOfScope) {
                     self.speakWeather( options ); //ask_rain, ask_when
                 }
             };
@@ -237,9 +229,9 @@ var self = {
         var request = require('request');
         request('http://gps.buienradar.nl/getrr.php?lat=' + lat + '&lon=' + lon, function (error, response, body) {
             if (!error && response.statusCode == 200) {
-                //var array = "000|14:05 000|14:10 000|14:15 000|14:20 000|14:25 025|14:30 052|14:35 040|14:40 050|14:45 060|14:50 070|14:55 080|15:00 000|15:05 000|15:10 000|15:15 000|15:20 000|15:25 000|15:30 000|15:35 000|15:40 000|15:45 000|15:50 000|15:55 000|16:00 000|16:05";
-                //var array = array.split(' '); //Enable this line again when using testing string instead of the real weather
-                var dataArray = body.split('\r\n'); //split into seperate items
+                var array = "000|16:05 000|16:10 000|16:15 000|16:20 000|16:25 025|16:30 052|16:35 040|16:40 050|16:45 060|16:50 070|16:55 080|15:00 000|15:05 000|15:10 000|15:15 000|15:20 000|15:25 000|15:30 000|15:35 000|15:40 000|15:45 000|15:50 000|15:55 000|16:00 000|16:05";
+                var dataArray = array.split(' '); //Enable this line again when using testing string instead of the real weather
+                //var dataArray = body.split('\r\n'); //split into seperate items
 
                 Homey.log ("dataArray: " + dataArray); //location
 
@@ -434,7 +426,7 @@ var self = {
         if (maxIntensity < 85) rainIntensity = __("light");
         if (maxIntensity> 85 && rainAverage < 255) rainIntensity = __("moderate");
         if (maxIntensity > 255) rainIntensity = __("heavy");
-        if (maxIntensity == 0) rainIntensity = __("no");
+        if (maxIntensity == 0) rainIntensity = __("non");
 
         //Normal yes and no
         if (rainAverage == 0) yesNo = __("no");
@@ -461,21 +453,26 @@ var self = {
         if (options.speech.indexOf("stop" && stop != null) > -1) options.when = stop + " " + __("minutes"); //"stop" and stop exists
         if (options.speech.indexOf("when") > -1 || options.speech.indexOf("how") > -1) yesNo = ""; //Don't say Yes or No when user asks for when or how
 
-        if (options.whenRelative == null && options.speech.indexOf("start") > -1 || options.speech.indexOf("stop") > -1) options.whenRelative = __("at"); //But if it is start or stop make it at
+        //if (options.whenRelative == null && options.speech.indexOf("start") > -1 || options.speech.indexOf("stop") > -1) options.whenRelative = __("at"); //But if it is start or stop make it at
         if (options.whenRelative == null) options.whenRelative = __("in"); //By default it is in
         if (options.whenRelative == "before") options.whenRelative = __("before"); 
         if (options.whenRelative == "after") options.whenRelative = __("after"); 
-        if (options.whenRelative == "at") options.whenRelative = __("in"); //ToDo fix "at" in "in" issue
+        if (options.whenRelative == "at") options.whenRelative = __("at");
+
+        if (options.whenRelative == "at") options.whenRelative2 = __("in the next");
+        if (options.whenRelative == null) options.whenRelative2 = __("");
+
+        console.log('options.whenRelative', options.whenRelative);
 
         //Speak one of the sentences
         if (options.speech.indexOf("start") > -1 && start != null) {
-            output = __("start_rain", { "yesNo": yesNo, "rainIntensity": rainIntensity, "whenRelative": options.whenRelative, "when": options.when } );
+            output = __("start_rain", { "yesNo": yesNo, "rainIntensity": rainIntensity, "whenRelative2": options.whenRelative2, "when": options.when } );
         } else if (options.speech.indexOf("stop") > -1 && stop != null) {
-            output = __("stop_rain", { "yesNo": yesNo, "rainIntensity": rainIntensity, "whenRelative": options.whenRelative, "when": options.when } );
+            output = __("stop_rain", { "yesNo": yesNo, "rainIntensity": rainIntensity, "whenRelative2": options.whenRelative2, "when": options.when } );
         } else if (options.speech.indexOf("start") > -1 && start == null) {
-            output = __("not_start_rain", { "yesNo": yesNo, "rainIntensity": rainIntensity, "whenRelative": options.whenRelative, "when": options.when } );
+            output = __("not_start_rain", { "yesNo": yesNo, "rainIntensity": rainIntensity, "whenRelative2": options.whenRelative2, "when": options.when } );
         } else if (options.speech.indexOf("stop") > -1 && stop == null && rainAverage > 0) {
-            output = __("not_stop_rain", { "yesNo": yesNo, "rainIntensity": rainIntensity, "whenRelative": options.whenRelative, "when": options.when } );
+            output = __("not_stop_rain", { "yesNo": yesNo, "rainIntensity": rainIntensity, "whenRelative2": options.whenRelative2, "when": options.when } );
         } else if (options.when == __("now")) {
             output = __("rain_now", { "yesNo": yesNo, "rainIntensity": rainIntensity, "when": options.when } )
         } else if (rainAverage >= 1) {

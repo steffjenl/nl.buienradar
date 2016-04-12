@@ -938,13 +938,8 @@
       {
         "id": "raining_in",
         "title": {
-<<<<<<< HEAD
           "en": "It !{{is|isn't}} going to rain in...",
-          "nl": "Het !{{gaat|gaat niet}} regenen in..."
-=======
-          "en": "It is going to rain in...",
-          "nl": "Het gaat regenen over..."
->>>>>>> f7329470e4bd9e954973d335d091a9ee1ddf2cc7
+          "nl": "Het !{{gaat|gaat niet}} regenen over..."
         },
         "args": [
           {
