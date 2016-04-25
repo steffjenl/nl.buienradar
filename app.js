@@ -87,7 +87,7 @@ var self = {
 
     //Listen for speech
     onSpeech: function(speech) {
-        if( !speech ) { 
+        if( !speech || !speech.transcript ) { 
             throw new Error('No speech object available');
         } else {
             Homey.log("Speech is triggered:", speech);
@@ -101,7 +101,6 @@ var self = {
 
             Homey.log(speech.transcript);
 
-            var umbrella;
             var s = speech.transcript;
 
             // Only available for coming 2 hours
@@ -110,11 +109,6 @@ var self = {
 
             } else {
                 speech.triggers.forEach(function(trigger){ //Listen for triggers
-
-                    if ( trigger.id == 'umbrella' ) {
-                        self.umbrella(trigger);
-                        umbrella = true;
-                    }
 
                     if ( trigger.id == 'minute' || trigger.id == 'hour' ) {
                         Homey.log("Trying to find numbers");
@@ -156,7 +150,7 @@ var self = {
                         options['when'] = 60;
                     } else if ( trigger.id == 'two_hours' ) {
                         options['when'] = 120;
-                    } else if (s.indexOf (__("going")) > -1 || s.indexOf(__("soon")) > -1 || s.indexOf(__("will")) > -1 || s.indexOf(__("expect")) > -1 || s.indexOf(__("predict")) > -1) {
+                    } else if (s.indexOf (__("going")) > -1 || s.indexOf(__("soon")) > -1 || s.indexOf(__("will")) > -1 || s.indexOf(__("expect")) > -1 || s.indexOf(__("predict")) > -1 || s.indexOf(__("when")) > -1) {
                         if (options['when'] == null) options['when'] = 120; //When future en when is empty --> 120 min
                     } else if (options['when'] == null) {
                         options['when'] = 0; //Default is 0 min
@@ -184,7 +178,7 @@ var self = {
                 if (cache == null) {
                     setTimeout( function() {self.speakWeather( options );}, 5000) //If no weather update yet, what 5 sec
                     Homey.log("Please wait, Homey is getting the buienradar info")
-                } else if (!umbrella && !outOfScope) {
+                } else if (!outOfScope) {
                     self.speakWeather( options ); //ask_rain, ask_when
                 }
             };
@@ -203,7 +197,7 @@ var self = {
 
         Homey.manager('geolocation').getLocation(function(err, location) {
             if( typeof location.latitude == 'undefined' || location.latitude == 0 ) {
-                locationCallback( new Error("location is undefined") );
+                callback( new Error("location is undefined") );
                 return;
             } else {
                 Homey.log( location );
@@ -230,8 +224,9 @@ var self = {
         request('http://gps.buienradar.nl/getrr.php?lat=' + lat + '&lon=' + lon, function (error, response, body) {
             if (!error && response.statusCode == 200) {
                 // TEST DATA: Should only be enabled in debug mode
-                // var array = "000|16:05 000|16:10 000|16:15 000|16:20 000|16:25 025|16:30 052|16:35 040|16:40 050|16:45 060|16:50 070|16:55 080|15:00 000|15:05 000|15:10 000|15:15 000|15:20 000|15:25 000|15:30 000|15:35 000|15:40 000|15:45 000|15:50 000|15:55 000|16:00 000|16:05";
-                // var dataArray = array.split(' '); //Enable this line again when using testing string instead of the real weather
+                //var array = "000|23:05 000|23:10 000|23:15 000|23:20 000|23:25 025|23:30 052|23:35 040|23:40 050|23:45 060|23:50 000|23:55 000|00:00 000|00:05 000|00:10 000|00:15 000|00:20 000|00:25 000|00:30 000|00:35 000|00:40 000|00:45 000|00:50 000|00:55 000|01:00 000|01:05";
+                //var dataArray = array.split(' '); //Enable this line again when using testing string instead of the real weather
+                
                 var dataArray = body.split('\r\n'); //split into seperate items
 
                 Homey.log ("dataArray: " + dataArray); //location
@@ -394,9 +389,6 @@ var self = {
             rainAverage = rainTotal / rainEntrys;
         }
 
-        Homey.log("rainAverage", rainAverage); //Log the amount of rain
-        Homey.log(specificRainInfo); //Show the array of raiEntrys
-
         // Check intensity
         for (var time in specificRainInfo) {
             var mm = (specificRainInfo[time].mm); //Rain
@@ -439,7 +431,7 @@ var self = {
         if (foundIntensity == true && options.intensity != null) yesNo = __("yes");
         if (foundIntensity == false && options.intensity != null) yesNo = __("no");
 
-        if (stop == null && options.speech.indexOf("stop") > -1) yesNo = __("no"); //Rain will not stop
+        if (stop == null && options.speech.indexOf(__("stop")) > -1) yesNo = __("no"); //Rain will not stop
 
         if (options.when == 120) options.when = '2 ' + __("hours"); 
         if (options.when == 60) options.when = '1 ' + __("hour"); 
@@ -449,21 +441,24 @@ var self = {
 
         //Custom words and options for certain questions
         if (start != null && options.when != __("now")) options.when = start + " " + __("minutes"); //no certain time and start exists
-        if (stop == null && options.speech.indexOf("stop") > -1) options.when = '2 ' + __("hours"); //
-        if (options.speech.indexOf("start" && start != null) > -1) options.when = start + " " + __("minutes"); //"start" and start exists
-        if (options.speech.indexOf("stop" && stop != null) > -1) options.when = stop + " " + __("minutes"); //"stop" and stop exists
-        if (options.speech.indexOf("when") > -1 || options.speech.indexOf("how") > -1) yesNo = ""; //Don't say Yes or No when user asks for when or how
+        if (stop == null && options.speech.indexOf(__("stop")) > -1) options.when = '2 ' + __("hours"); //
+        if ((options.speech.indexOf(__("start")) > -1 || options.speech.indexOf(__("begin")) > -1) && start != null) options.when = start + " " + __("minutes"); //"start" and start exists
+        if ((options.speech.indexOf(__("stop")) > -1 || options.speech.indexOf(__("end")) > -1) && stop != null) options.when = stop + " " + __("minutes"); //"stop" and stop exists
+        if (options.speech.indexOf(__("when")) > -1 || options.speech.indexOf(__("how")) > -1) yesNo = ""; //Don't say Yes or No when user asks for when or how
+
+        if (options.whenRelative == "at") {
+            options.whenRelative2 = __("in the next");
+        } else {
+            if (options.whenRelative == null) options.whenRelative2 = __("in"); //By default it is in
+            if (options.whenRelative == "before") options.whenRelative2 = __("before"); 
+            if (options.whenRelative == "after") options.whenRelative2 = __("after"); 
+        }
 
         //if (options.whenRelative == null && options.speech.indexOf("start") > -1 || options.speech.indexOf("stop") > -1) options.whenRelative = __("at"); //But if it is start or stop make it at
         if (options.whenRelative == null) options.whenRelative = __("in"); //By default it is in
         if (options.whenRelative == "before") options.whenRelative = __("before"); 
         if (options.whenRelative == "after") options.whenRelative = __("after"); 
         if (options.whenRelative == "at") options.whenRelative = __("at");
-
-        if (options.whenRelative == "at") options.whenRelative2 = __("in the next");
-        if (options.whenRelative == null) options.whenRelative2 = __("");
-
-        console.log('options.whenRelative', options.whenRelative);
 
         //Speak one of the sentences
         if (options.speech.indexOf("start") > -1 && start != null) {
@@ -484,24 +479,6 @@ var self = {
 
         Homey.log("Homey say: " + output);
         Homey.manager('speech-output').say( output );
-    },
-
-    umbrella: function(trigger) {
-        self.raining_in(function(err, result) {
-            console.log(arguments);
-            console.log('result', result);
-            console.log(trigger);
-            console.log(trigger.text);
-            var output;
-
-            if (result == true) {
-                output = __("umbrella", { "triggerText": trigger.text } );
-            } else if (result == false) {
-                output = __("no_umbrella", { "triggerText": trigger.text } );
-            }
-            Homey.manager('speech-output').say( output );
-            console.log("This is the output", output);
-        }, "120")
     }
 }
 
