@@ -224,10 +224,10 @@ var self = {
         request('http://gps.buienradar.nl/getrr.php?lat=' + lat + '&lon=' + lon, function (error, response, body) {
             if (!error && response.statusCode == 200) {
                 // TEST DATA: Should only be enabled in debug mode
-                 var array = "000|18:05 000|18:10 000|18:15 000|18:20 000|18:25 025|18:30 052|18:35 040|18:40 050|18:45 060|18:50 000|18:55 000|15:00 000|00:05 000|00:10 000|00:15 000|00:20 000|00:25 000|00:30 000|00:35 000|00:40 000|00:45 000|00:50 000|00:55 000|01:00 000|01:05";
-                 var dataArray = array.split(' '); //Enable this line again when using testing string instead of the real weather
+                // var array = "000|18:05 000|18:10 000|18:15 000|18:20 000|18:25 025|18:30 052|18:35 040|18:40 050|18:45 060|18:50 000|18:55 000|15:00 000|00:05 000|00:10 000|00:15 000|00:20 000|00:25 000|00:30 000|00:35 000|00:40 000|00:45 000|00:50 000|00:55 000|01:00 000|01:05";
+                // var dataArray = array.split(' '); //Enable this line again when using testing string instead of the real weather
                 
-                //var dataArray = body.split('\r\n'); //split into seperate items
+                var dataArray = body.split('\r\n'); //split into seperate items
 
                 Homey.log ("dataArray: " + dataArray); //location
 
@@ -349,7 +349,6 @@ var self = {
                     rainTotal = rainTotal + mm;
                     if (mm > 0) rainEntrys = rainEntrys + 1;
                     if (mm > maxIntensity) maxIntensity = mm;
-                    Homey.log("at");
                 }
             } else if (options.whenRelative == 'at' || options.when == 0) {
                 if (time == options.when) {
@@ -359,7 +358,6 @@ var self = {
                     rainTotal = rainTotal + mm;
                     if (mm > 0) rainEntrys = rainEntrys + 1;
                     if (mm > maxIntensity) maxIntensity = mm;
-                    Homey.log("at");
                 }
             } else if (options.whenRelative == 'before' || options.whenRelative == null) { //If before or not defined
                 if (time <= options.when) {
@@ -369,7 +367,6 @@ var self = {
                     rainTotal = rainTotal + mm;
                     if (mm > 0) rainEntrys = rainEntrys + 1;
                     if (mm > maxIntensity) maxIntensity = mm;
-                    Homey.log("before");
                 }
             } else if (options.whenRelative == 'after') {
                 if (time >= options.when) {
@@ -379,7 +376,6 @@ var self = {
                     rainTotal = rainTotal + mm;
                     if (mm > 0) rainEntrys = rainEntrys + 1;
                     if (mm > maxIntensity) maxIntensity = mm;
-                    Homey.log("after");
                 }
             }
         }
@@ -399,17 +395,15 @@ var self = {
                     if (found == false) { start = time; found = true };
                     stop = time;
                     lastObj = true;
-                    Homey.log("It will rain without intensity!")
                 } else if (options.intensity < mm) { //Certain intensity
                     if (found == false) { start = time; found = true };
                     stop = time;
                     lastObj = true;
                     foundIntensity = true;
-                    Homey.log("It will rain that hard!")
                 }
             }
             if (mm == 0) { //No rain
-                Homey.log("It wil stay dry");
+                // It will stay dry
             }
         }
 
