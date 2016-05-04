@@ -1,7 +1,7 @@
 {
 	"yes": "yes",
 	"no": "no",
-	"non": "no",
+	"not": "not",
 	"light": "light",
 	"moderate": "moderate",
 	"heavy": "heavy",
@@ -10,7 +10,7 @@
 	"minute": "minute",
 	"minutes": "minutes",
 	"now": "now",
-	"whitin": "whitin",
+	"within": "within",
 	"in": "in",
 	"in the next": "in the next",
 	"before": "before",
@@ -41,6 +41,6 @@
 	"not_stop_rain": "__yesNo__, it will not stop raining __rainIntensity__ __whenRelative2__ __when__",
 	"rain": "__yesNo__, it is going to rain __rainIntensity__ __whenRelative__ __when__",
     "no_rain": "__yesNo__, there is no rain expected __whenRelative__ __when__",
-    "rain_now": "__yesNo__, it is raining __rainIntensity__ __when__",
+    "rain_now": "__yesNo__, it is __rainIntensity__ raining __when__",
     "no_rain_now": "__yesNo__, it is not raining right __when__"
 }

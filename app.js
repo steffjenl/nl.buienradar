@@ -224,10 +224,10 @@ var self = {
         request('http://gps.buienradar.nl/getrr.php?lat=' + lat + '&lon=' + lon, function (error, response, body) {
             if (!error && response.statusCode == 200) {
                 // TEST DATA: Should only be enabled in debug mode
-                //var array = "000|23:05 000|23:10 000|23:15 000|23:20 000|23:25 025|23:30 052|23:35 040|23:40 050|23:45 060|23:50 000|23:55 000|00:00 000|00:05 000|00:10 000|00:15 000|00:20 000|00:25 000|00:30 000|00:35 000|00:40 000|00:45 000|00:50 000|00:55 000|01:00 000|01:05";
-                //var dataArray = array.split(' '); //Enable this line again when using testing string instead of the real weather
+                 var array = "000|18:05 000|18:10 000|18:15 000|18:20 000|18:25 025|18:30 052|18:35 040|18:40 050|18:45 060|18:50 000|18:55 000|15:00 000|00:05 000|00:10 000|00:15 000|00:20 000|00:25 000|00:30 000|00:35 000|00:40 000|00:45 000|00:50 000|00:55 000|01:00 000|01:05";
+                 var dataArray = array.split(' '); //Enable this line again when using testing string instead of the real weather
                 
-                var dataArray = body.split('\r\n'); //split into seperate items
+                //var dataArray = body.split('\r\n'); //split into seperate items
 
                 Homey.log ("dataArray: " + dataArray); //location
 
@@ -419,7 +419,7 @@ var self = {
         if (maxIntensity < 85) rainIntensity = __("light");
         if (maxIntensity> 85 && rainAverage < 255) rainIntensity = __("moderate");
         if (maxIntensity > 255) rainIntensity = __("heavy");
-        if (maxIntensity == 0) rainIntensity = __("non");
+        if (maxIntensity == 0) rainIntensity = __("not");
 
         //Normal yes and no
         if (rainAverage == 0) yesNo = __("no");
@@ -433,7 +433,7 @@ var self = {
 
         if (stop == null && options.speech.indexOf(__("stop")) > -1) yesNo = __("no"); //Rain will not stop
 
-        if (options.when == 120) options.when = '2 ' + __("hours"); 
+        if (options.when == 120) options.when = '2 ' + __("hours");
         if (options.when == 60) options.when = '1 ' + __("hour"); 
         if (options.when == 1) options.when = options.when + " " + __("minute"); 
         if (options.when == 0) options.when = __("now");
@@ -450,6 +450,7 @@ var self = {
             options.whenRelative2 = __("in the next");
         } else {
             if (options.whenRelative == null) options.whenRelative2 = __("in"); //By default it is in
+            if (options.whenRelative == null && options.when == '2 ' + __("hours")) options.whenRelative2 = __("within");
             if (options.whenRelative == "before") options.whenRelative2 = __("before"); 
             if (options.whenRelative == "after") options.whenRelative2 = __("after"); 
         }
