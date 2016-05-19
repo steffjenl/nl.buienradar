@@ -1,6 +1,6 @@
 {
   "id": "nl.buienradar",
-  "version": "1.1.7",
+  "version": "2.0.0",
   "compatibility": "0.x || 1.x",
   "category": "internet",
   "name": {
@@ -26,43 +26,26 @@
     "homey:manager:speech-input",
     "homey:manager:geolocation"
   ],
-  "dependencies": {
-    "request": "*"
-  },
   "speech": [
-    {
-      "id": "minute",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "minutes",
-          "minute"
-        ],
-        "nl": [
-          "minuten",
-          "minuut"
-        ]
-      }
-    },
     {
       "id": "rain",
       "importance": 0.9,
       "triggers": {
         "en": [
           "rain",
-          "shower",
-          "showers",
           "raining",
           "precipitation",
           "rainfall",
-          "drizzle",
-          "drops"
+          "showers",
+          "drops",
+          "shower",
+          "drizzle"
         ],
         "nl": [
           "regen",
           "regent",
           "regenen",
-          "bui",         
+          "bui",
           "buien",
           "buitje",
           "neerslag",
@@ -74,11 +57,10 @@
     },
     {
       "id": "dry",
-      "importance": 0.9,
+      "importance": 0.7,
       "triggers": {
         "en": [
-          "dry",
-          "stops raining"
+          "dry"
         ],
         "nl": [
           "droog",
@@ -109,37 +91,54 @@
       }
     },
     {
-      "id": "no",
+      "id": "negate",
       "importance": false,
       "triggers": {
         "en": [
           "no",
-          "not"
+          "not",
+          "stop",
+          "end",
+          "ends",
+          "stops"
         ],
         "nl": [
           "niet",
-          "geen"
-        ]
-      }
-    },
-    {
-      "id": "stop",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "stop",
-          "end",
-          "ends"
-        ],
-        "nl": [
+          "geen",
           "stoppen",
           "stopt"
         ]
       }
     },
     {
-      "id": "start",
+      "id": "in",
       "importance": false,
+      "triggers": {
+        "en": [
+          "in",
+          "at"
+        ],
+        "nl": [
+          "over",
+          "om"
+        ]
+      }
+    },
+    {
+      "id": "from_now",
+      "importance": false,
+      "triggers": {
+        "en": [
+          "from now"
+        ],
+        "nl": [
+          "vanaf nu"
+        ]
+      }
+    },
+    {
+      "id": "start",
+      "importance": 0.1,
       "triggers": {
         "en": [
           "start",
@@ -169,16 +168,50 @@
       }
     },
     {
-      "id": "how",
+      "id": "will",
       "importance": false,
       "triggers": {
         "en": [
-          "how",
-          "what"
+          "will"
         ],
         "nl": [
-          "hoe",
-          "wat"
+          "gaat"
+        ]
+      }
+    },
+    {
+      "id": "going",
+      "importance": false,
+      "triggers": {
+        "en": [
+          "going"
+        ],
+        "nl": [
+          "gaat"
+        ]
+      }
+    },
+    {
+      "id": "after",
+      "importance": false,
+      "triggers": {
+        "en": [
+          "after"
+        ],
+        "nl": [
+          "over"
+        ]
+      }
+    },
+    {
+      "id": "expected",
+      "importance": false,
+      "triggers": {
+        "en": [
+          "expected"
+        ],
+        "nl": [
+          "verwacht"
         ]
       }
     },
@@ -198,6 +231,33 @@
       }
     },
     {
+      "id": "for",
+      "importance": false,
+      "triggers": {
+        "en": [
+          "for"
+        ],
+        "nl": [
+          "voor",
+          "tot"
+        ]
+      }
+    },
+    {
+      "id": "coming",
+      "importance": 0.1,
+      "triggers": {
+        "en": [
+          "coming",
+          "following",
+          "next"
+        ],
+        "nl": [
+          "komende"
+        ]
+      }
+    },
+    {
       "id": "after",
       "importance": false,
       "triggers": {
@@ -212,16 +272,29 @@
       }
     },
     {
-      "id": "at",
+      "id": "longer",
       "importance": false,
       "triggers": {
         "en": [
-          "at",
-          "on"
+          "longer",
+          "more than"
         ],
         "nl": [
-          "om",
-          "op"
+          "langer",
+          "meer dan"
+        ]
+      }
+    },
+    {
+      "id": "soon",
+      "importance": false,
+      "triggers": {
+        "en": [
+          "soon",
+          "near future"
+        ],
+        "nl": [
+          "binnenkort"
         ]
       }
     },
@@ -231,6 +304,7 @@
       "triggers": {
         "en": [
           "light",
+          "lightly",
           "little",
           "drizzle"
         ],
@@ -249,6 +323,7 @@
       "triggers": {
         "en": [
           "moderate",
+          "moderately",
           "normal"
         ],
         "nl": [
@@ -264,7 +339,6 @@
         "en": [
           "heavy",
           "heavily",
-          "intense",
           "hard"
         ],
         "nl": [
@@ -278,565 +352,22 @@
       }
     },
     {
-      "id": "hour",
+      "id": "violent",
       "importance": false,
       "triggers": {
         "en": [
-          "hours",
-          "hour"
+          "violent",
+          "violently",
+          "intense",
+          "extreme"
         ],
         "nl": [
-          "uren",
-          "uur"
-        ]
-      }
-    },
-    {
-      "id": "two_hours",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "two hours",
-          "2 hours"
-        ],
-        "nl": [
-          "twee uur",
-          "2 uur"
-        ]
-      }
-    },
-    {
-      "id": "half-hour",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "half an hour"
-        ],
-        "nl": [
-          "half uur",
-          "half uurtje"
-        ]
-      }
-    },
-    {
-      "id": "quarter",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "quarter"
-        ],
-        "nl": [
-          "kwartier",
-          "kwartiertje"
-        ]
-      }
-    },
-    {
-      "id": "now",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "now",
-          "at this moment",
-          "right now",
-          "currently"
-        ],
-        "nl": [
-          "nu",
-          "op het moment",
-          "momenteel"
-        ]
-      }
-    },
-    {
-      "id": "0",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "zero"
-        ],
-        "nl": [
-          "nul"
-        ]
-      }
-    },
-    {
-      "id": "1",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "one"
-        ],
-        "nl": [
-          "een"
-        ]
-      }
-    },
-    {
-      "id": "2",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "two"
-        ],
-        "nl": [
-          "twee"
-        ]
-      }
-    },
-    {
-      "id": "3",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "three"
-        ],
-        "nl": [
-          "drie"
-        ]
-      }
-    },
-    {
-      "id": "4",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "four"
-        ],
-        "nl": [
-          "vier"
-        ]
-      }
-    },
-    {
-      "id": "5",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "five"
-        ],
-        "nl": [
-          "vijf"
-        ]
-      }
-    },
-    {
-      "id": "6",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "six"
-        ],
-        "nl": [
-          "zes"
-        ]
-      }
-    },
-    {
-      "id": "7",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "seven"
-        ],
-        "nl": [
-          "seven"
-        ]
-      }
-    },
-    {
-      "id": "8",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "eight"
-        ],
-        "nl": [
-          "acht"
-        ]
-      }
-    },
-    {
-      "id": "9",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "nine"
-        ],
-        "nl": [
-          "negen"
-        ]
-      }
-    },
-    {
-      "id": "10",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "ten"
-        ],
-        "nl": [
-          "tien"
-        ]
-      }
-    },
-    {
-      "id": "11",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "eleven"
-        ],
-        "nl": [
-          "elf"
-        ]
-      }
-    },
-    {
-      "id": "12",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "twelve"
-        ],
-        "nl": [
-          "twaalf"
-        ]
-      }
-    },
-    {
-      "id": "13",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "thirteen"
-        ],
-        "nl": [
-          "dertien"
-        ]
-      }
-    },
-    {
-      "id": "14",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "fourteen"
-        ],
-        "nl": [
-          "veertien"
-        ]
-      }
-    },
-    {
-      "id": "15",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "fifteen"
-        ],
-        "nl": [
-          "vijftien"
-        ]
-      }
-    },
-    {
-      "id": "16",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "sixteen"
-        ],
-        "nl": [
-          "zestien"
-        ]
-      }
-    },
-    {
-      "id": "17",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "seventeen"
-        ],
-        "nl": [
-          "zeventien"
-        ]
-      }
-    },
-    {
-      "id": "18",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "eighteen"
-        ],
-        "nl": [
-          "achtien"
-        ]
-      }
-    },
-    {
-      "id": "19",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "nineteen"
-        ],
-        "nl": [
-          "negentien"
-        ]
-      }
-    },
-    {
-      "id": "20",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "twenty"
-        ],
-        "nl": [
-          "twintig"
-        ]
-      }
-    },
-    {
-      "id": "21",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "twenty-one"
-        ],
-        "nl": [
-          "eenentwintig"
-        ]
-      }
-    },
-    {
-      "id": "22",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "twenty-two"
-        ],
-        "nl": [
-          "tweeentwintig"
-        ]
-      }
-    },
-    {
-      "id": "23",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "twenty-three"
-        ],
-        "nl": [
-          "drieentwintig"
-        ]
-      }
-    },
-    {
-      "id": "24",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "twenty-four"
-        ],
-        "nl": [
-          "vierentwintig"
-        ]
-      }
-    },
-    {
-      "id": "25",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "twenty-five"
-        ],
-        "nl": [
-          "vijfentwintig"
-        ]
-      }
-    },
-    {
-      "id": "26",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "twenty-six"
-        ],
-        "nl": [
-          "zesentwintig"
-        ]
-      }
-    },
-    {
-      "id": "27",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "twenty-seven"
-        ],
-        "nl": [
-          "zevenentwintig"
-        ]
-      }
-    },
-    {
-      "id": "28",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "twenty-eight"
-        ],
-        "nl": [
-          "achtentwintig"
-        ]
-      }
-    },
-    {
-      "id": "29",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "twenty-nine"
-        ],
-        "nl": [
-          "negenentwintig"
-        ]
-      }
-    },
-    {
-      "id": "30",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "thirty"
-        ],
-        "nl": [
-          "dertig"
-        ]
-      }
-    },
-    {
-      "id": "40",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "fourthy"
-        ],
-        "nl": [
-          "veertig"
-        ]
-      }
-    },
-    {
-      "id": "45",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "fourthy-five"
-        ],
-        "nl": [
-          "vijfenveertig"
-        ]
-      }
-    },
-    {
-      "id": "50",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "fifty"
-        ],
-        "nl": [
-          "vijftig"
-        ]
-      }
-    },
-    {
-      "id": "60",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "sixty"
-        ],
-        "nl": [
-          "zestig"
-        ]
-      }
-    },
-    {
-      "id": "70",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "seventy"
-        ],
-        "nl": [
-          "zeventig"
-        ]
-      }
-    },
-    {
-      "id": "80",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "eighty"
-        ],
-        "nl": [
-          "tachtig"
-        ]
-      }
-    },
-    {
-      "id": "90",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "ninety"
-        ],
-        "nl": [
-          "negentig"
-        ]
-      }
-    },
-    {
-      "id": "100",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "hundred"
-        ],
-        "nl": [
-          "honderd"
-        ]
-      }
-    },
-    {
-      "id": "110",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "hundred ten"
-        ],
-        "nl": [
-          "honderdtien"
-        ]
-      }
-    },
-    {
-      "id": "120",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "hundred twenty"
-        ],
-        "nl": [
-          "honderdtwintig"
+          "zwaar",
+          "zware",
+          "intens",
+          "hard",
+          "stevig",
+          "flink"
         ]
       }
     }
