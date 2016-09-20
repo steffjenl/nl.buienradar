@@ -46,5 +46,8 @@
 		"hours": "__amount__ uur",
 		"minutes": "__amount__ minuten",
 		"time": "__hours__ en __minutes__"
+	},
+	"error": {
+		"no_data": "Sorry, Ik kan de data niet van de Buien Radar server krijgen. Probeer later opnieuw alstublieft."
 	}
 }

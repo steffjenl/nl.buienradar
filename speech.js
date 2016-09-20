@@ -148,6 +148,10 @@ function speechToAnswer(speech) {
 	Homey.log('speech parsed', speech, options);
 
 	return dataRequest.then(rainData => {
+		if(rainData.length === 0){
+			return __('error.no_data');
+		}
+
 		const rainTime = getRainTime(rainData, options.minRain, options.maxRain, options.fromTime, options.toTime, options.checkInterval);
 		const resultIsCurrently = rainTime.first &&
 			rainTime.first.time - 10 * 60 * 1000 <= Date.now() &&
