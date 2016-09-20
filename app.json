@@ -1,7 +1,7 @@
 {
   "id": "nl.buienradar",
   "version": "2.0.0",
-  "compatibility": "0.x || 1.x",
+  "compatibility": ">=0.8",
   "category": "internet",
   "name": {
     "en": "Buienradar",
@@ -63,10 +63,7 @@
           "dry"
         ],
         "nl": [
-          "droog",
-          "stop de regen",
-          "stopt de regen",
-          "stopt het met regenen"
+          "droog"
         ]
       }
     },
@@ -77,7 +74,7 @@
         "en": [
           "umbrella",
           "umbrellas",
-          "rain cloths",
+          "rain clothes",
           "rain coat"
         ],
         "nl": [
@@ -216,30 +213,17 @@
       }
     },
     {
-      "id": "before",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "before",
-          "for",
-          "until"
-        ],
-        "nl": [
-          "voor",
-          "tot"
-        ]
-      }
-    },
-    {
       "id": "for",
       "importance": false,
       "triggers": {
         "en": [
-          "for"
+          "for",
+          "at least"
         ],
         "nl": [
           "voor",
-          "tot"
+          "tot",
+          "minstens"
         ]
       }
     },
@@ -253,7 +237,9 @@
           "next"
         ],
         "nl": [
-          "komende"
+          "komende",
+          "volgende",
+          "aankomende"
         ]
       }
     },
@@ -294,7 +280,8 @@
           "near future"
         ],
         "nl": [
-          "binnenkort"
+          "binnenkort",
+          "straks"
         ]
       }
     },
@@ -539,8 +526,6 @@
           }
         ]
       }
-    ],
-    "actions": [
     ]
   }
 }
