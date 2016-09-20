@@ -4,11 +4,25 @@ const Buienradar = require('buienradar');
 
 module.exports.init = function init() {
 	Homey.manager('speech-input').on('speech', speech => {
-		speechToAnswer(speech)
-			.then(speech.say)
-			.catch(err => {
-				throw err;
+		if (Homey.app.api.hasLocation()) {
+			speechToAnswer(speech)
+				.then(speech.say)
+				.catch(err => {
+					throw err;
+				});
+		} else {
+			Homey.app.setLocation(err => {
+				if (err) {
+					speech.say(__('error.no_location'));
+				} else {
+					speechToAnswer(speech)
+						.then(speech.say)
+						.catch(err => {
+							throw err;
+						});
+				}
 			});
+		}
 	});
 };
 
@@ -148,7 +162,7 @@ function speechToAnswer(speech) {
 	Homey.log('speech parsed', speech, options);
 
 	return dataRequest.then(rainData => {
-		if(rainData.length === 0){
+		if (rainData.length === 0) {
 			return __('error.no_data');
 		}
 
