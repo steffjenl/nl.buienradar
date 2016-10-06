@@ -20,7 +20,7 @@ function setLocation(callback) {
 	// });
 
 	Homey.manager('geolocation').getLocation((err, location) => {
-		if (!err) {
+		if (!err && location) {
 			api.setLatLon(location.latitude, location.longitude);
 		}
 		if (callback) {
