@@ -8,6 +8,7 @@ module.exports.init = function init() {
 			speechToAnswer(speech)
 				.then(speech.say)
 				.catch(err => {
+					speech.say(__('error.404'));
 					throw err;
 				});
 		} else {
@@ -18,6 +19,7 @@ module.exports.init = function init() {
 					speechToAnswer(speech)
 						.then(speech.say)
 						.catch(err => {
+							speech.say(__('error.404'));
 							throw err;
 						});
 				}
@@ -445,7 +447,7 @@ function speechToAnswer(speech) {
 		response = response.charAt(0).toUpperCase() + response.slice(1);
 		return response;
 	}).catch(err => {
-		err.message += speech;
+		console.log('error in speech request', err);
 		throw err;
 	});
 }
