@@ -6,7 +6,25 @@ const flowManager = Homey.manager('flow');
 module.exports.init = function init() {
 	setInterval(checkRaining, 5 * 60 * 1000);
 
-	Homey.manager('flow').on('trigger.raining_in', checkRainingIn.bind(null, false));
+	const rainingInState = new Map();
+	const dryInState = new Map();
+	Homey.manager('flow').on('trigger.raining_in', (callback, args) => {
+		checkRainingIn(false, (err, state) => {
+			if (err) return callback(err);
+
+			callback(null, state && !rainingInState.get(args.when));
+			rainingInState.set(args.when, state);
+		}, args);
+	});
+	Homey.manager('flow').on('trigger.dry_in', (callback, args) => {
+		checkRainingIn(false, (err, state) => {
+			if (err) return callback(err);
+
+			state = !state;
+			callback(null, state && !dryInState.get(args.when));
+			dryInState.set(args.when, state);
+		}, args);
+	});
 	Homey.manager('flow').on('condition.raining_in', checkRainingIn.bind(null, true));
 	Homey.manager('flow').on('condition.is_raining', checkIsRaining);
 };
@@ -23,7 +41,8 @@ function checkRaining() {
 		}
 		wasRaining = isRaining;
 
-		Homey.manager('flow').trigger('raining_in');
+		flowManager.trigger('raining_in');
+		flowManager.trigger('dry_in');
 	});
 }
 
