@@ -169,8 +169,13 @@ function speechToAnswer(speech) {
 		}
 
 		const rainTime = getRainTime(rainData, options.minRain, options.maxRain, options.fromTime, options.toTime, options.checkInterval);
+
+		if (!rainTime) {
+			return __('error.could_not_parse');
+		}
+
 		const resultIsCurrently = rainTime.first &&
-			rainTime.first.time - 10 * 60 * 1000 <= Date.now() &&
+			rainTime.current &&
 			(!options.minRain || rainTime.current.indication >= options.minRain) &&
 			(!options.maxRain || rainTime.current.indication <= options.maxRain);
 
@@ -240,7 +245,7 @@ function speechToAnswer(speech) {
 				}
 			} else {
 				if (rainTime.first) {
-					if (rainTime.current.indication >= options.minRain && resultIsCurrently) {
+					if (rainTime.current && rainTime.current.indication >= options.minRain && resultIsCurrently) {
 						rainTime.first = rainTime.current;
 						if (!triggers.when) {
 							result.start = __('yes');
@@ -447,7 +452,7 @@ function speechToAnswer(speech) {
 		response = response.charAt(0).toUpperCase() + response.slice(1);
 		return response;
 	}).catch(err => {
-		console.log('error in speech request', err);
+		console.log('error in speech request', err, err.stack);
 		throw err;
 	});
 }
@@ -571,5 +576,8 @@ function getRainTime(rainData, minRain, maxRain, fromTime, toTime, checkFor) {
 			}
 		}
 	});
+	if (!result.current && result.first && result.first.time - 5 * 60 * 1000 < Date.now()) {
+		result.current = result.first;
+	}
 	return checkedRain ? result : false;
 }
