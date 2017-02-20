@@ -358,7 +358,31 @@
         ]
       }
     }
-  ],
+  ], 
+  "speechExamples": {
+    "en": [
+      "Will it rain?",
+      "When will it start raining?",
+      "When will it stop raining?",
+      "When will the heavy rain stop?",
+      "When will it be dry for 30 minutes?",
+      "Will there be heavy rain?",
+      "Is it going to rain in 'x' minutes?",
+      "Is it raining right now?",
+      "Do I need to bring my umbrella?"
+    ],
+    "nl": [
+      "Gaat het regenen?",
+      "Wanneer gaat het regenen?",
+      "Wanneer stopt het met regenen?",
+      "Wanneer stopt het met hard regenen?",
+      "blijft het de komende 30 minuten droog?",
+      "Gaat het hard regenen?",
+      "Regent het over 'x' minuten?",
+      "Regent het momenteel?",
+      "Heb ik een paraplu nodig?"
+    ]
+  },
   "flow": {
     "triggers": [
       {
