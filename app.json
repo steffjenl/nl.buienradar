@@ -1,7 +1,7 @@
 {
   "id": "nl.buienradar",
   "version": "2.0.7",
-  "compatibility": ">=0.8",
+  "compatibility": ">=1.2.0",
   "category": "internet",
   "name": {
     "en": "Buienradar",
@@ -26,7 +26,79 @@
     "homey:manager:speech-input",
     "homey:manager:geolocation"
   ],
-  "speech": [
+  "newSpeech": {
+    "todo": [
+      {
+        "id": "for",
+        "importance": false,
+        "triggers": {
+          "en": [
+            "for",
+            "at least"
+          ],
+          "nl": [
+            "voor",
+            "tot",
+            "minstens"
+          ]
+        }
+      },
+      {
+        "id": "coming",
+        "importance": 0.1,
+        "triggers": {
+          "en": [
+            "coming",
+            "following",
+            "next"
+          ],
+          "nl": [
+            "komende",
+            "volgende",
+            "aankomende"
+          ]
+        }
+      },
+      {
+        "id": "longer",
+        "importance": false,
+        "triggers": {
+          "en": [
+            "longer",
+            "more than"
+          ],
+          "nl": [
+            "langer",
+            "meer dan"
+          ]
+        }
+      },
+      {
+        "id": "soon",
+        "importance": false,
+        "triggers": {
+          "en": [
+            "soon",
+            "near future"
+          ],
+          "nl": [
+            "binnenkort",
+            "straks"
+          ]
+        }
+      }
+    ],
+    "en": {
+      "element": {
+        "rain": {
+          "type": "regex",
+          "value": ""
+        },
+        "dry": {}
+      }
+    }
+  },
+  "oldSpeech": [
     {
       "id": "rain",
       "importance": 0.9,
@@ -112,7 +184,6 @@
       "importance": false,
       "triggers": {
         "en": [
-          "in",
           "at"
         ],
         "nl": [
@@ -598,5 +669,96 @@
         ]
       }
     ]
+  },
+  "speech": {
+    "en": {
+      "element": {
+        "rain": {
+          "type": "regex",
+          "value": "rain(ing|fall)?|precipitation|showers?|drops?|drizzle"
+        },
+        "dry": {
+          "type": "regex",
+          "value": "dry"
+        },
+        "negate": {
+          "type": "regex",
+          "value": "no|not|stops?|ends?"
+        },
+        "for": {
+          "type": "regex",
+          "value": "for|at least"
+        },
+        "following": {
+          "type": "regex",
+          "value": "following|coming|next|in"
+        },
+        "longer": {
+          "type": "regex",
+          "value": "(longer|more) (than|as)"
+        },
+        "soon": {
+          "type": "regex",
+          "value": "soon|near future"
+        },
+        "between": {
+          "type": "regex",
+          "value": "between"
+        },
+        "light": {
+          "type": "regex",
+          "value": "light(ly)?|little|drizzle"
+        },
+        "moderate": {
+          "type": "regex",
+          "value": "moderate(ly)?|normal"
+        },
+        "heavy": {
+          "type": "regex",
+          "value": "heav(y|ily)|hard"
+        },
+        "violent": {
+          "type": "regex",
+          "value": "violent(ly)|intense(ly)|extreme(ly)"
+        }
+      },
+      "group": {
+        "forTime": {
+          "set": "for && TIME",
+          "allowDisconnect": false,
+          "ordered": true
+        },
+        "followingTime": {
+          "set": "following && TIME",
+          "allowDisconnect": false,
+          "ordered": true
+        },
+        "longerTime": {
+          "set": "longer && TIME",
+          "ordered": true
+        },
+        "altTime": {
+          "set": "TIME"
+        },
+        "betweenTime": {
+          "set": "between && TIME && TIME",
+          "ordered": true
+        },
+        "rainType": {
+          "set": "light || moderate || heavy || violent"
+        },
+        "rainToken": {
+          "set": "rain || umbrella || dry"
+        },
+        "rainGroup": {
+          "set": "(rainType) && rainToken && (altTime) && (soon) && (followingTime) && (forTime) && (longerTime)",
+          "ordered": true
+        },
+        "main": {
+          "set": "rainGroup && (negate)",
+          "capturingGroup": true
+        }
+      }
+    }
   }
 }

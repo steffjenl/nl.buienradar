@@ -3,32 +3,37 @@
 const Buienradar = require('buienradar');
 
 module.exports.init = function init() {
-	Homey.manager('speech-input').on('speech', speech => {
+	Homey.manager('speech-input').on('speech', (speech, callback) => {
+		console.log('onspeech', speech, callback);
 		if (Homey.app.api.hasLocation()) {
 			speechToAnswer(speech)
-				.then(speech.say)
+				.then(callback.bind(null, null))
 				.catch(err => {
-					speech.say(__('error.404'));
+					callback(null, true);
 					throw err;
 				});
 		} else {
 			Homey.app.setLocation(err => {
-				if (err) {
-					speech.say(__('error.no_location'));
-				} else {
+				if (err) { callback(null, __('error.no_location')); } else {
 					speechToAnswer(speech)
-						.then(speech.say)
+						.then(callback.bind(null, null))
 						.catch(err => {
-							speech.say(__('error.404'));
+							callback(null, true);
 							throw err;
 						});
 				}
 			});
 		}
 	});
+
+	Homey.manager('speech-input').on('speechMatch', (speech, response) => {
+		console.log('responding', response);
+		speech.say(response);
+	});
 };
 
 function speechToAnswer(speech) {
+	console.log('got speech', speech);
 	const dataRequest = Homey.app.api.getRainData();
 	const triggers = {};
 	const options = {
