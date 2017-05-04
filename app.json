@@ -1,6 +1,6 @@
 {
   "id": "nl.buienradar",
-  "version": "2.0.2",
+  "version": "2.0.7",
   "compatibility": ">=0.8",
   "category": "internet",
   "name": {
@@ -358,7 +358,31 @@
         ]
       }
     }
-  ],
+  ], 
+  "speechExamples": {
+    "en": [
+      "Will it rain?",
+      "When will it start raining?",
+      "When will it stop raining?",
+      "When will the heavy rain stop?",
+      "When will it be dry for 30 minutes?",
+      "Will there be heavy rain?",
+      "Is it going to rain in 'x' minutes?",
+      "Is it raining right now?",
+      "Do I need to bring my umbrella?"
+    ],
+    "nl": [
+      "Gaat het regenen?",
+      "Wanneer gaat het regenen?",
+      "Wanneer stopt het met regenen?",
+      "Wanneer stopt het met hard regenen?",
+      "blijft het de komende 30 minuten droog?",
+      "Gaat het hard regenen?",
+      "Regent het over 'x' minuten?",
+      "Regent het momenteel?",
+      "Heb ik een paraplu nodig?"
+    ]
+  },
   "flow": {
     "triggers": [
       {
@@ -380,6 +404,77 @@
         "title": {
           "en": "It is going to rain in...",
           "nl": "Het gaat regenen over..."
+        },
+        "args": [
+          {
+            "name": "when",
+            "type": "dropdown",
+            "values": [
+              {
+                "id": "5",
+                "label": {
+                  "en": "5 minutes",
+                  "nl": "5 minuten"
+                }
+              },
+              {
+                "id": "10",
+                "label": {
+                  "en": "10 minutes",
+                  "nl": "10 minuten"
+                }
+              },
+              {
+                "id": "15",
+                "label": {
+                  "en": "15 minutes",
+                  "nl": "15 minuten"
+                }
+              },
+              {
+                "id": "30",
+                "label": {
+                  "en": "30 minutes",
+                  "nl": "30 minuten"
+                }
+              },
+              {
+                "id": "45",
+                "label": {
+                  "en": "45 minutes",
+                  "nl": "45 minuten"
+                }
+              },
+              {
+                "id": "60",
+                "label": {
+                  "en": "1 hour",
+                  "nl": "1 hour"
+                }
+              },
+              {
+                "id": "90",
+                "label": {
+                  "en": "1.5 hours",
+                  "nl": "1.5 uur"
+                }
+              },
+              {
+                "id": "120",
+                "label": {
+                  "en": "2 hours",
+                  "nl": "2 uur"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "dry_in",
+        "title": {
+          "en": "It is going to be dry in...",
+          "nl": "Het stopt met regenen over..."
         },
         "args": [
           {

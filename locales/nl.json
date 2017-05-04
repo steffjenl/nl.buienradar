@@ -49,6 +49,7 @@
 	},
 	"error": {
 		"no_data": "Sorry, Ik kan de data niet van de Buien Radar server krijgen. Probeer later opnieuw alstublieft.",
-		"no_location": "Sorry, er is geen correcte gps locatie ingesteld. Controleer alstublieft de locatie in het instellingen menu van Homey."
+		"no_location": "Sorry, er is geen correcte gps locatie ingesteld. Controleer alstublieft de locatie in het instellingen menu van Homey.",
+		"404": "Sorry, Ik kan de Buien Radar server niet bereiken. Probeer later opnieuw alstublieft."
 	}
 }
