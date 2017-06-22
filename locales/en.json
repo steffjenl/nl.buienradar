@@ -48,8 +48,8 @@
 		"time": "__hours__ and __minutes__"
 	},
 	"error": {
-		"no_data": "Sorry, I could not get the data from the Buien Radar server. Please try again later.",
-		"no_location": "Sorry, There is no valid gps location set. Please check your location in the settings menu of Homey.",
+		"no_data": "Sorry, I could not get the data from the Rain Radar server. Please try again later.",
+		"no_location": "Sorry, There is no valid gps location set. Please check your location in the settings menu of Homey."
 		"404": "Sorry, I could not reach the Buien radar server. Please try again later.",
 		"could_not_parse": "Sorry, but I could not parse the data. Please try again later or send a email to support at athom dot com"
 	}
