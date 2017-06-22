@@ -1,11 +1,11 @@
 {
   "id": "nl.buienradar",
-  "version": "2.0.11",
+  "version": "2.1.0",
   "compatibility": ">=0.8",
   "category": "internet",
   "name": {
-    "en": "Buienradar stable",
-    "nl": "Buienradar stable"
+    "en": "Buienradar",
+    "nl": "Buienradar"
   },
   "description": {
     "en": "Informs you about the expected rain",
