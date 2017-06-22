@@ -4,7 +4,8 @@ const Buienradar = require('buienradar');
 const flowManager = Homey.manager('flow');
 
 module.exports.init = function init() {
-	setInterval(checkRaining, 5 * 60 * 1000);
+	setInterval(checkRaining, 2 * 60 * 1000);
+	checkRaining();
 
 	const rainingInState = new Map();
 	const dryInState = new Map();
@@ -30,8 +31,8 @@ module.exports.init = function init() {
 };
 
 let wasRaining = false;
-function checkRaining() {
-	Homey.app.api.getRainData().then(rainData => {
+function checkRaining(retryCount) {
+	Homey.app.api.getRainData(retryCount !== undefined).then(rainData => {
 		const isRaining = isRainTill(rainData, Date.now());
 
 		if (isRaining && !wasRaining) {
@@ -43,7 +44,9 @@ function checkRaining() {
 
 		flowManager.trigger('raining_in');
 		flowManager.trigger('dry_in');
-	});
+	}).catch(() =>
+		!retryCount || retryCount < 5 ? setTimeout(checkRaining.bind(null, (retryCount || 0) + 1), 1000 * (retryCount || 0)) : null
+	);
 }
 
 function checkRainingIn(fromStart, callback, args) {

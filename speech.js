@@ -491,7 +491,7 @@ function getTimeDeltaString(timeA, timeB) {
 		if (minutes) {
 			return __('time_units.time', { hours, minutes });
 		}
-		return;
+		return hours;
 	}
 	return minutes;
 }
