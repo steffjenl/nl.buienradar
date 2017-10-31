@@ -1,6 +1,6 @@
 'use strict';
 
-const Buienradar = require('buienradar');
+const Buienradar = require('./lib/buienradar');
 const flowManager = Homey.manager('flow');
 
 module.exports.init = function init() {

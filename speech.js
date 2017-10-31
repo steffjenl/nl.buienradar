@@ -1,6 +1,6 @@
 'use strict';
 
-const Buienradar = require('buienradar');
+const Buienradar = require('./lib/buienradar');
 
 module.exports.init = function init() {
 	Homey.manager('speech-input').on('speech', speech => {

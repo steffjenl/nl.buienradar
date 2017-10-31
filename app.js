@@ -1,6 +1,6 @@
 'use strict';
 
-const Buienradar = require('buienradar');
+const Buienradar = require('./lib/buienradar');
 
 const api = new Buienradar({ lat: 52, lon: 5.1, requestCacheTimeout: 60000 });
 
