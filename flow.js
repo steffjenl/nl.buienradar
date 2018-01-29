@@ -1,80 +1,100 @@
 'use strict';
 
 const Buienradar = require('./lib/buienradar');
-const flowManager = Homey.manager('flow');
+const {FlowCardTrigger, FlowCardCondition} = require('homey');
 
-module.exports.init = function init() {
-	setInterval(checkRaining, 2 * 60 * 1000);
-	checkRaining();
+class FlowManager {
+	constructor(api) {
+		this.api = api;
+		this.wasRaining = false;
+		setInterval(this.checkRaining, 2 * 60 * 1000);
 
-	const rainingInState = new Map();
-	const dryInState = new Map();
-	Homey.manager('flow').on('trigger.raining_in', (callback, args) => {
-		checkRainingIn(false, (err, state) => {
-			if (err) return callback(err);
+		const rainingInState = new Map();
+		const dryInState = new Map();
 
-			callback(null, state && !rainingInState.get(args.when));
-			rainingInState.set(args.when, state);
-		}, args);
-	});
-	Homey.manager('flow').on('trigger.dry_in', (callback, args) => {
-		checkRainingIn(false, (err, state) => {
-			if (err) return callback(err);
+		// Raining in trigger and condition
+		this.rainingInTrigger = new FlowCardTrigger('raining_in');
+		this.rainingInTrigger.registerRunListener( async (args, state) => {
+			let rainingIn = await this.checkRainingIn(false, args);
+			let result = rainingIn && !rainingInState.get(args.when);
+			rainingInState.set(args.when, rainingIn);
+			return result;
+		}).register();
 
-			state = !state;
-			callback(null, state && !dryInState.get(args.when));
-			dryInState.set(args.when, state);
-		}, args);
-	});
-	Homey.manager('flow').on('condition.raining_in', checkRainingIn.bind(null, true));
-	Homey.manager('flow').on('condition.is_raining', checkIsRaining);
-};
+		this.rainingInCondition = new FlowCardCondition('raining_in');
+		this.rainingInCondition.registerRunListener(this.checkRainingIn.bind(this, true)).register();
 
-let wasRaining = false;
-function checkRaining(retryCount) {
-	Homey.app.api.getRainData(retryCount !== undefined).then(rainData => {
-		const isRaining = isRainTill(rainData, Date.now());
+		// Dry in trigger
+		this.dryInTrigger = new FlowCardTrigger('dry_in');
+		this.dryInTrigger.registerRunListener( async (args, state) => {
+			let dryIn = await this.checkRainingIn(false, args);
+			let result = dryIn && !dryInState.get(args.when);
+			dryInState.set(args.when, dryIn);
+			return result;
+		}).register();
 
-		if (isRaining && !wasRaining) {
-			flowManager.trigger('rain_start');
-		} else if (!isRaining && wasRaining) {
-			flowManager.trigger('rain_stop');
-		}
-		wasRaining = isRaining;
+		this.rainingCondition = new FlowCardCondition('is_raining');
+		this.rainingCondition.registerRunListener(this.checkIsRaining.bind(this, true)).register();
 
-		flowManager.trigger('raining_in');
-		flowManager.trigger('dry_in');
-	}).catch(() =>
-		!retryCount || retryCount < 5 ? setTimeout(checkRaining.bind(null, (retryCount || 0) + 1), 1000 * (retryCount || 0)) : null
-	);
-}
+		// Rain start trigger
+		this.rainStartTrigger = new FlowCardTrigger('rain_start').register();
 
-function checkRainingIn(fromStart, callback, args) {
-	Homey.app.api.getRainData().then(rainData => {
+		// Rain stop trigger
+		this.rainStopTrigger = new FlowCardTrigger('rain_stop').register();
+	}
+
+	retry(timeout) {
+		return new Promise(resolve => {
+			setTimeout(this.checkRaining, timeout);
+		});
+	}
+
+	async checkRainingIn(fromStart, args) {
+		let rainData = await this.api.getRainData();
 		const checkDate = Date.now() + args.when * 60 * 1000;
+		return isRainTill(rainData, checkDate, fromStart ? null : (checkDate - 6 * 60 * 1000));
+	}
 
-		const isRaining = isRainTill(rainData, checkDate, fromStart ? null : (checkDate - 6 * 60 * 1000));
+	async checkIsRaining() {
+		let rainData = await this.api.getRainData();
+		return rainData[0].indication >= Buienradar.rainIndicators.LIGHT_RAIN;
+	}
 
-		callback(null, isRaining);
+	async checkRaining() {
+		let retryCount = 0;
 
-	}).catch(err => callback(err));
+		for (var i = 0; i < 4; i++) {
+			try {
+				let rainData = await this.api.getRainData();
+				const isRaining = this.isRainTill(rainData, Date.now());
+
+				if (isRaining && !wasRaining) {
+					this.rainStartTrigger.trigger();
+				} else if (!isRaining && wasRaining) {
+					this.rainStopTrigger.trigger();
+				}
+
+				wasRaining = isRaining;
+
+				this.rainingInTrigger.trigger();
+				this.dryInTrigger.trigger();
+			} catch(err) {
+				this.retry(1000 * retryCount);
+			}
+		}
+
+		throw new Error('Buienradar API offline');
+	}
+
+	isRainTill(rainData, endDate, startDate, indication) {
+		endDate = rainData[0].time <= endDate ? endDate : rainData[0].time;
+		startDate = startDate || rainData[0].time;
+		startDate = rainData[rainData.length - 1].time >= startDate ? startDate : rainData[rainData.length - 1].time;
+		endDate = endDate >= startDate ? endDate : startDate;
+		indication = !isNaN(indication) ? indication : Buienradar.rainIndicators.LIGHT_RAIN;
+
+		return rainData.reduce((prev, data) => prev || ((data.time <= endDate && data.time >= startDate) && data.indication >= indication), false);
+	}
 }
 
-function checkIsRaining(callback) {
-	Homey.app.api.getRainData()
-		.then(rainData => callback(null, rainData[0].indication >= Buienradar.rainIndicators.LIGHT_RAIN))
-		.catch(err => callback(err));
-}
-
-function isRainTill(rainData, endDate, startDate, indication) {
-	endDate = rainData[0].time <= endDate ? endDate : rainData[0].time;
-	startDate = startDate || rainData[0].time;
-	startDate = rainData[rainData.length - 1].time >= startDate ? startDate : rainData[rainData.length - 1].time;
-	endDate = endDate >= startDate ? endDate : startDate;
-	indication = !isNaN(indication) ? indication : Buienradar.rainIndicators.LIGHT_RAIN;
-
-	return rainData.reduce(
-		(prev, data) => prev || ((data.time <= endDate && data.time >= startDate) && data.indication >= indication),
-		false
-	);
-}
+module.exports = FlowManager;
