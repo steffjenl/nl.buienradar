@@ -7,7 +7,7 @@ class FlowManager {
 	constructor(api) {
 		this.api = api;
 		this.wasRaining = false;
-		setInterval(this.checkRaining, 2 * 60 * 1000);
+		setInterval(this.checkRaining.bind(this), 2 * 60 * 1000);
 
 		const rainingInState = new Map();
 		const dryInState = new Map();
@@ -43,9 +43,9 @@ class FlowManager {
 		this.rainStopTrigger = new FlowCardTrigger('rain_stop').register();
 	}
 
-	retry(timeout) {
+	delay(timeout) {
 		return new Promise(resolve => {
-			setTimeout(this.checkRaining, timeout);
+			setTimeout(resolve, timeout);
 		});
 	}
 
@@ -79,7 +79,7 @@ class FlowManager {
 				this.rainingInTrigger.trigger();
 				this.dryInTrigger.trigger();
 			} catch(err) {
-				this.retry(1000 * retryCount);
+				await this.delay(1000 * retryCount);
 			}
 		}
 
