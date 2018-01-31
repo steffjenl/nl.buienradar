@@ -5,15 +5,29 @@ const Homey = require('homey');
 
 class SpeechManager {
 	constructor() {
-		Homey.ManagerSpeechInput.on('speechEval', async (speech) => {
-			let response = await this.speechToAnswer(speech);
+
+		Homey.ManagerSpeechInput.on('speechEval', async ( speech, callback ) => {
+				// let match = await this.speechToAnswer(speech);
+				//console.log(`Match found: ${match}`);
+		    //callback( null, match );
+				//return match;
+				callback(null, "test123");
+		});
+
+		Homey.ManagerSpeechInput.on('speechMatch', (speech, response) => {
+
+			console.dir(speech, {depth: null});
 
 			if (Homey.app.api.hasLocation()) {
-				Homey.ManagerSpeechOutput.say(response);
+				speech.say(response);
+				// Homey.ManagerSpeechOutput.say(response);
 			} else {
 				Homey.app.setLocation();
-				Homey.ManagerSpeechOutput.say(response);
+				speech.say(response);
+				// Homey.ManagerSpeechOutput.say(response);
 			}
+
+			console.log('Speechmatch finished');
 		});
 	}
 
@@ -41,10 +55,10 @@ class SpeechManager {
 			end: '',
 		};
 
-		if (speech.time) {
+		if (speech.times) {
 			const now = new Date();
-			speech.time = speech.time.sort((a, b) => a.index - b.index);
-			speech.time.forEach(time => {
+			speech.times = speech.times.sort( (a, b) => a.index - b.index);
+			speech.times.forEach( time => {
 				time.date = new Date(
 					time.time.year || now.getFullYear(),
 					time.time.month || now.getMonth(),
@@ -55,6 +69,43 @@ class SpeechManager {
 				);
 			});
 		}
+
+		speech.matches = speech.matches.sort( (a, b) => a.position - b.position);
+		speech.matches.keys.forEach(key => {
+			switch (key) {
+				case 'objects':
+					options.raining = true;
+					break;
+				case 'forecastsType':
+					if (speech.matches['forecastsType'].transcript !== ('dry' || 'droog') ) {
+						options.raining = true;
+					} else {
+						options.raining = false;
+					}
+					break;
+				case 'negates':
+					options.raining = !options.raining;
+					break;
+				case 'severities':
+					break;
+				default:
+			}
+		});
+    //
+		// if (speech.time) {
+		// 	const now = new Date();
+		// 	speech.time = speech.time.sort((a, b) => a.index - b.index);
+		// 	speech.time.forEach(time => {
+		// 		time.date = new Date(
+		// 			time.time.year || now.getFullYear(),
+		// 			time.time.month || now.getMonth(),
+		// 			time.time.day || now.getDay(),
+		// 			time.time.hour || now.getHours(),
+		// 			time.time.minute || 0,
+		// 			time.time.second || 0
+		// 		);
+		// 	});
+		// }
 		speech.triggers = speech.triggers.sort((a, b) => a.position - b.position);
 		speech.triggers.forEach(trigger => triggers[trigger.id] = trigger);
 		speech.triggers.forEach(trigger => {
@@ -69,7 +120,7 @@ class SpeechManager {
 				case 'longer':
 				case 'for': {
 					options.responseType = 'interval';
-					const forTime = getTimeAfterIndex(speech, trigger.position);
+					const forTime = this.getTimeAfterIndex(speech, trigger.position);
 					if (forTime && !isNaN(forTime.date)) {
 						if (trigger.id === 'longer') {
 							forTime.date = new Date(forTime.date + 60000);
@@ -83,30 +134,30 @@ class SpeechManager {
 					break;
 				}
 				case 'in': {
-					const inTime = getTimeAfterIndex(speech, trigger.position);
+					const inTime = this.getTimeAfterIndex(speech, trigger.position);
 					if (inTime && !isNaN(inTime.date)) {
 						const slack = 3 * 60 * 1000;
 						options.fromTime = new Date(inTime.date.getTime() - slack);
 						options.toTime = new Date(inTime.date.getTime() + (!isNaN(options.checkInterval) ? options.checkInterval : slack));
-						result.time = __('time.in', { time: getTimeDeltaString(inTime.date) });
+						result.time = Homey.__('time.in', { time: this.getTimeDeltaString(inTime.date) });
 						options.inTime = inTime.date;
 					}
 					break;
 				}
 				case 'from_now': {
-					const fromNowTime = getTimeAfterIndex(speech, trigger.position, true);
+					const fromNowTime = this.getTimeAfterIndex(speech, trigger.position, true);
 					if (fromNowTime && !isNaN(fromNowTime.date)) {
 						const slack = 3 * 60 * 1000;
 						options.fromTime = new Date(fromNowTime.date.getTime() - slack);
 						options.toTime = new Date(fromNowTime.date.getTime() + (!isNaN(options.checkInterval) ? options.checkInterval : slack));
-						result.time = __('time.in', { time: getTimeDeltaString(fromNowTime.date) });
+						result.time = Homey.__('time.in', { time: this.getTimeDeltaString(fromNowTime.date) });
 						options.inTime = fromNowTime.date;
 					}
 					break;
 				}
 				case 'coming':
 					options.fromTime = new Date();
-					options.toTime = getTimeAfterIndex(speech, trigger.position).date;
+					options.toTime = this.getTimeAfterIndex(speech, trigger.position).date;
 					result.time = '';
 					options.inTime = undefined;
 					break;
@@ -126,9 +177,9 @@ class SpeechManager {
 				case 'heavy':
 				case 'violent':
 					options.checkInterval = 0;
-					options.minRain = getRainIndicationFromTrigger(trigger);
+					options.minRain = this.getRainIndicationFromTrigger(trigger);
 					options.rainType = options.minRain;
-					options.rainTypeString = `${getRainIndicationString(options.minRain)} `;
+					options.rainTypeString = `${this.getRainIndicationString(options.minRain)} `;
 					break;
 				default:
 					break;
@@ -136,7 +187,7 @@ class SpeechManager {
 		});
 		if (!options.raining) {
 			options.maxRain = options.maxRain ||
-				(options.minRain ? changeIndicatorBySteps(options.minRain, -1) : false) ||
+				(options.minRain ? this.changeIndicatorBySteps(options.minRain, -1) : false) ||
 				Buienradar.rainIndicators.NO_RAIN;
 			options.minRain = Buienradar.rainIndicators.NO_RAIN;
 		}
@@ -150,17 +201,17 @@ class SpeechManager {
 		}
 		options.minRain = options.minRain || Buienradar.rainIndicators.LIGHT_RAIN;
 
-		app.log('speech parsed', speech, options);
+		Homey.app.log('speech parsed', speech, options);
 
 		return dataRequest.then(rainData => {
 			if (rainData.length === 0) {
-				return __('error.no_data');
+				return Homey.__('error.no_data');
 			}
 
-			const rainTime = getRainTime(rainData, options.minRain, options.maxRain, options.fromTime, options.toTime, options.checkInterval);
+			const rainTime = this.getRainTime(rainData, options.minRain, options.maxRain, options.fromTime, options.toTime, options.checkInterval);
 
 			if (!rainTime) {
-				return __('error.could_not_parse');
+				return Homey.__('error.could_not_parse');
 			}
 
 			const resultIsCurrently = rainTime.first &&
@@ -173,63 +224,63 @@ class SpeechManager {
 					if (rainTime.first) {
 						if (!triggers.when) {
 							if (rainTime.first.time - options.fromTime <= 10 * 60 * 1000 || options.soon) {
-								result.start = __('yes');
+								result.start = Homey.__('yes');
 							} else {
-								result.start = __('no_but');
+								result.start = Homey.__('no_but');
 							}
 						}
 						if (options.rainType) {
 							if (!triggers.when) {
-								result.rain = __('no');
+								result.rain = Homey.__('no');
 							}
-							result.rain = __('rain.no_expected', { rainType: options.rainTypeString });
+							result.rain = Homey.__('rain.no_expected', { rainType: options.rainTypeString });
 							if (!resultIsCurrently) {
-								result.time = result.time || __('time.in', { time: getTimeDeltaString(rainTime.first.time) });
+								result.time = result.time || Homey.__('time.in', { time: this.getTimeDeltaString(rainTime.first.time) });
 							}
 						} else {
 							if (resultIsCurrently) {
-								result.rain = __('dry.currently');
+								result.rain = Homey.__('dry.currently');
 								result.time = '';
 							} else {
-								result.rain = __('dry.expected');
-								result.time = __('time.in', { time: getTimeDeltaString(rainTime.first.time) });
+								result.rain = Homey.__('dry.expected');
+								result.time = Homey.__('time.in', { time: this.getTimeDeltaString(rainTime.first.time) });
 							}
 						}
-						const time = getTimeDeltaString(
+						const time = this.getTimeDeltaString(
 							rainTime.last ? rainTime.last.time : rainData[rainData.length - 1].time, rainTime.first.time
 						);
 						if (rainTime.last) {
-							result.end = __('time.for', { time });
+							result.end = Homey.__('time.for', { time });
 						} else {
-							result.end = __('time.for_atleast', { time });
+							result.end = Homey.__('time.for_atleast', { time });
 						}
 					} else {
-						const invertedRainTime = getRainTime(
+						const invertedRainTime = this.getRainTime(
 							rainData,
-							changeIndicatorBySteps(options.maxRain, 1),
+							this.changeIndicatorBySteps(options.maxRain, 1),
 							null,
 							options.fromTime,
 							options.toTime,
 							options.checkInterval
 						);
-						const rainType = getRainTypeString(invertedRainTime);
+						const rainType = this.getRainTypeString(invertedRainTime);
 						if (!triggers.when) {
-							result.start = __('no');
+							result.start = Homey.__('no');
 						}
 						if (options.fromTime <= Date.now()) {
-							result.rain = __('rain.currently', { rainType });
+							result.rain = Homey.__('rain.currently', { rainType });
 						} else {
-							result.rain = __('rain.expected', { rainType });
-							result.time = result.time || __('time.in', { time: getTimeDeltaString(invertedRainTime.first.time) });
+							result.rain = Homey.__('rain.expected', { rainType });
+							result.time = result.time || Homey.__('time.in', { time: this.getTimeDeltaString(invertedRainTime.first.time) });
 						}
-						const time = getTimeDeltaString(
+						const time = this.getTimeDeltaString(
 							invertedRainTime.last ? invertedRainTime.last.time : rainData[rainData.length - 1].time,
 							invertedRainTime.first.time
 						);
 						if (invertedRainTime.last) {
-							result.end = __('time.last_for', { time });
+							result.end = Homey.__('time.last_for', { time });
 						} else {
-							result.end = __('time.last_for_atleast', { time });
+							result.end = Homey.__('time.last_for_atleast', { time });
 						}
 					}
 				} else {
@@ -237,52 +288,52 @@ class SpeechManager {
 						if (rainTime.current && rainTime.current.indication >= options.minRain && resultIsCurrently) {
 							rainTime.first = rainTime.current;
 							if (!triggers.when) {
-								result.start = __('yes');
+								result.start = Homey.__('yes');
 							}
-							result.rain = __('rain.currently', { rainType: `${getRainTypeString(rainTime)} ` });
+							result.rain = Homey.__('rain.currently', { rainType: `${this.getRainTypeString(rainTime)} ` });
 						} else {
 							if (!triggers.when) {
 								if (rainTime.first.time - options.fromTime <= 10 * 60 * 1000) {
-									result.start = __('yes');
+									result.start = Homey.__('yes');
 								} else {
-									result.start = __('no_but');
+									result.start = Homey.__('no_but');
 								}
 							}
-							result.rain = __('rain.expected', { rainType: `${getRainTypeString(rainTime)} ` });
-							result.time = result.time || __('time.in', { time: getTimeDeltaString(rainTime.first.time) });
+							result.rain = Homey.__('rain.expected', { rainType: `${this.getRainTypeString(rainTime)} ` });
+							result.time = result.time || Homey.__('time.in', { time: getTimeDeltaString(rainTime.first.time) });
 						}
 
-						const time = getTimeDeltaString(rainTime.last ? rainTime.last.time : rainData[rainData.length - 1].time, rainTime.first.time);
+						const time = this.getTimeDeltaString(rainTime.last ? rainTime.last.time : rainData[rainData.length - 1].time, rainTime.first.time);
 						if (rainTime.last) {
-							result.end = __('time.last_for', { time });
+							result.end = Homey.__('time.last_for', { time });
 						} else {
-							result.end = __('time.last_for_atleast', { time });
+							result.end = Homey.__('time.last_for_atleast', { time });
 						}
 					} else {
-						const invertedRainTime = getRainTime(
+						const invertedRainTime = this.getRainTime(
 							rainData,
 							Buienradar.rainIndicators.NO_RAIN,
-							changeIndicatorBySteps(options.minRain, -1),
+							this.changeIndicatorBySteps(options.minRain, -1),
 							options.fromTime,
 							options.toTime,
 							options.checkInterval
 						);
 						if (!triggers.when) {
-							result.start = __('no');
+							result.start = Homey.__('no');
 						}
 						if (options.minRain === Buienradar.rainIndicators.NO_RAIN) {
-							result.rain = __('dry.expected');
+							result.rain = Homey.__('dry.expected');
 						} else {
-							result.rain = __('rain.no_expected', { rainType: options.rainTypeString });
+							result.rain = Homey.__('rain.no_expected', { rainType: options.rainTypeString });
 						}
-						const time = getTimeDeltaString(
+						const time = this.getTimeDeltaString(
 							invertedRainTime.last ? invertedRainTime.last.time : rainData[rainData.length - 1].time,
 							invertedRainTime.first.time
 						);
 						if (invertedRainTime.last) {
-							result.end = __('time.for', { time });
+							result.end = Homey.__('time.for', { time });
 						} else {
-							result.end = __('time.for_atleast', { time });
+							result.end = Homey.__('time.for_atleast', { time });
 						}
 					}
 				}
@@ -295,33 +346,33 @@ class SpeechManager {
 						)
 					) {
 						if (!triggers.when) {
-							result.start = __('yes');
+							result.start = Homey.__('yes');
 						}
 						if (!resultIsCurrently) {
-							result.rain = __('dry.expected');
+							result.rain = Homey.__('dry.expected');
 						} else {
-							result.rain = __('dry.currently');
+							result.rain = Homey.__('dry.currently');
 						}
-						result.time = result.time || __('time.in', { time: getTimeDeltaString(rainTime.first.time) });
-						const time = getTimeDeltaString(rainTime.last ? rainTime.last.time : rainData[rainData.length - 1].time, rainTime.first.time);
+						result.time = result.time || Homey.__('time.in', { time: this.getTimeDeltaString(rainTime.first.time) });
+						const time = this.getTimeDeltaString(rainTime.last ? rainTime.last.time : rainData[rainData.length - 1].time, rainTime.first.time);
 						if (rainTime.last) {
-							result.end = __('time.for', { time });
+							result.end = Homey.__('time.for', { time });
 						} else {
-							result.end = __('time.for_atleast', { time });
+							result.end = Homey.__('time.for_atleast', { time });
 						}
 					} else {
 						if (!triggers.when) {
-							result.startPrefix = __('no');
+							result.startPrefix = Homey.__('no');
 						}
-						result.rain = __('dry.will_not');
-						const time = getTimeDeltaString(new Date(Date.now() + options.checkInterval));
+						result.rain = Homey.__('dry.will_not');
+						const time = this.getTimeDeltaString(new Date(Date.now() + options.checkInterval));
 						if (triggers.longer) {
-							result.end = __('time.for_period', { time });
+							result.end = Homey.__('time.for_period', { time });
 						} else {
-							result.end = __('time.for', { time });
+							result.end = Homey.__('time.for', { time });
 						}
 						if (triggers.when) {
-							result.end += ` ${__('time.next_2_hours')}`;
+							result.end += ` ${Homey.__('time.next_2_hours')}`;
 						}
 					}
 				} else {
@@ -332,33 +383,33 @@ class SpeechManager {
 						)
 					) {
 						if (!triggers.when) {
-							result.start = __('yes');
+							result.start = Homey.__('yes');
 						}
 						if (resultIsCurrently) {
-							result.rain = __('rain.currently', { rainType: `${getRainTypeString(rainTime)} ` });
+							result.rain = Homey.__('rain.currently', { rainType: `${this.getRainTypeString(rainTime)} ` });
 						} else {
-							result.rain = __('rain.expected', { rainType: `${getRainTypeString(rainTime)} ` });
-							result.time = result.time || __('time.in', { time: getTimeDeltaString(rainTime.first.time) });
+							result.rain = Homey.__('rain.expected', { rainType: `${this.getRainTypeString(rainTime)} ` });
+							result.time = result.time || Homey.__('time.in', { time: this.getTimeDeltaString(rainTime.first.time) });
 						}
-						const time = getTimeDeltaString(rainTime.last ? rainTime.last.time : rainData[rainData.length - 1].time, rainTime.first.time);
+						const time = this.getTimeDeltaString(rainTime.last ? rainTime.last.time : rainData[rainData.length - 1].time, rainTime.first.time);
 						if (rainTime.last) {
-							result.end = __('time.last_for', { time });
+							result.end = Homey.__('time.last_for', { time });
 						} else {
-							result.end = __('time.last_for_atleast', { time });
+							result.end = Homey.__('time.last_for_atleast', { time });
 						}
 					} else {
 						if (!triggers.when) {
-							result.start = __('no');
+							result.start = Homey.__('no');
 						}
-						result.rain = __('rain.will_be_no', { rainType: options.rainTypeString });
-						const time = getTimeDeltaString(new Date(Date.now() + options.checkInterval));
+						result.rain = Homey.__('rain.will_be_no', { rainType: options.rainTypeString });
+						const time = this.getTimeDeltaString(new Date(Date.now() + options.checkInterval));
 						if (triggers.longer) {
-							result.end = __('time.for_longer', { time });
+							result.end = Homey.__('time.for_longer', { time });
 						} else {
-							result.end = __('time.for_period', { time });
+							result.end = Homey.__('time.for_period', { time });
 						}
 						if (triggers.when) {
-							result.end += __('time.next_2_hours');
+							result.end += Homey.__('time.next_2_hours');
 						}
 					}
 				}
@@ -366,7 +417,7 @@ class SpeechManager {
 				const rainList = [rainTime];
 				while (rainList[rainList.length - 1].last) {
 					rainList.push(
-						getRainTime(rainData, options.minRain, options.maxRain, rainList[rainList.length - 1].last.time + 1, null, options.checkInterval)
+						this.getRainTime(rainData, options.minRain, options.maxRain, rainList[rainList.length - 1].last.time + 1, null, options.checkInterval)
 					);
 				}
 				if (rainList.length === 1) {
@@ -374,28 +425,28 @@ class SpeechManager {
 						const rain = rainList[0];
 						const totalTime = (rain.last ? rain.last.time : rainData[rainData.length - 1].time) - rain.first.time;
 						if (totalTime > 30 * 60 * 1000) {
-							result.start = __('umbrella.should', { umbrella: options.umbrella });
+							result.start = Homey.__('umbrella.should', { umbrella: options.umbrella });
 						} else if (totalTime > 10 * 60 * 1000 || rain.max.indication >= Buienradar.rainIndicators.HEAVY_RAIN) {
-							result.start = __('umbrella.could', { umbrella: options.umbrella });
+							result.start = Homey.__('umbrella.could', { umbrella: options.umbrella });
 						} else {
-							result.start = __('umbrella.shouldnt', { umbrella: options.umbrella });
+							result.start = Homey.__('umbrella.shouldnt', { umbrella: options.umbrella });
 						}
 						if (resultIsCurrently) {
-							result.rain = __('rain.currently', { rainType: getRainTypeString(rain) });
+							result.rain = Homey.__('rain.currently', { rainType: this.getRainTypeString(rain) });
 						} else {
-							result.rain = __('rain.expected', { rainType: getRainTypeString(rain) });
-							result.time = result.time || __('time.in', { time: getTimeDeltaString(rain.first.time) });
+							result.rain = Homey.__('rain.expected', { rainType: this.getRainTypeString(rain) });
+							result.time = result.time || Homey.__('time.in', { time: this.getTimeDeltaString(rain.first.time) });
 						}
-						const time = getTimeDeltaString((rain.last ? rain.last.time : rainData[rainData.length - 1].time), rain.first.time);
+						const time = this.getTimeDeltaString((rain.last ? rain.last.time : rainData[rainData.length - 1].time), rain.first.time);
 						if (rain.last) {
-							result.end = __('time.last_for', { time });
+							result.end = Homey.__('time.last_for', { time });
 						} else {
-							result.end = __('time.last_for_atleast', { time });
+							result.end = Homey.__('time.last_for_atleast', { time });
 						}
 					} else {
-						result.start = __('umbrella.dont', { umbrella: options.umbrella });
-						result.rain = __('dry.expected');
-						result.end = __('time.for_atleast', { time: getTimeDeltaString(rainData[rainData.length - 1].time, options.fromTime) });
+						result.start = Homey.__('umbrella.dont', { umbrella: options.umbrella });
+						result.rain = Homey.__('dry.expected');
+						result.end = Homey.__('time.for_atleast', { time: this.getTimeDeltaString(rainData[rainData.length - 1].time, options.fromTime) });
 					}
 				} else {
 					const rain = rainList[0];
@@ -412,23 +463,23 @@ class SpeechManager {
 					});
 
 					if (totalTime > 30 * 60 * 1000) {
-						result.start = __('umbrella.should', { umbrella: options.umbrella });
+						result.start = Homey.__('umbrella.should', { umbrella: options.umbrella });
 					} else if (totalTime > 10 * 60 * 1000 || rain.max.indication >= Buienradar.rainIndicators.HEAVY_RAIN) {
-						result.start = __('umbrella.could', { umbrella: options.umbrella });
+						result.start = Homey.__('umbrella.could', { umbrella: options.umbrella });
 					} else {
-						result.start = __('umbrella.shouldnt', { umbrella: options.umbrella });
+						result.start = Homey.__('umbrella.shouldnt', { umbrella: options.umbrella });
 					}
 
-					result.rain = __('rain.showers', {
+					result.rain = Homey.__('rain.showers', {
 						amount: rainList.length,
-						time: getTimeDeltaString(rainData[rainData.length - 1].time, options.fromTime).replace(/^1\s/, ''),
+						time: this.getTimeDeltaString(rainData[rainData.length - 1].time, options.fromTime).replace(/^1\s/, ''),
 					});
 					if (resultIsCurrently) {
-						result.time = __('time.started');
+						result.time = Homey.__('time.started');
 					} else {
-						result.time = __('time.starting', { time: getTimeDeltaString(rain.first.time) });
+						result.time = Homey.__('time.starting', { time: this.getTimeDeltaString(rain.first.time) });
 					}
-					result.end = __('time.combined', { time: getTimeDeltaString(Date.now() + totalTime) });
+					result.end = Homey.__('time.combined', { time: this.getTimeDeltaString(Date.now() + totalTime) });
 				}
 			}
 
@@ -468,11 +519,11 @@ class SpeechManager {
 		const delta = Math.round(Math.abs(timeA - timeB) / 60000);
 		const hourCount = Math.floor(delta / 60);
 		const minuteCount = delta % 60;
-		const hours = hourCount ? __(`time_units.hour${hourCount === 1 ? '' : 's'}`, { amount: hourCount }) : false;
-		const minutes = minuteCount ? __(`time_units.minute${minuteCount === 1 ? '' : 's'}`, { amount: minuteCount }) : false;
+		const hours = hourCount ? Homey.__(`time_units.hour${hourCount === 1 ? '' : 's'}`, { amount: hourCount }) : false;
+		const minutes = minuteCount ? Homey.__(`time_units.minute${minuteCount === 1 ? '' : 's'}`, { amount: minuteCount }) : false;
 		if (hours) {
 			if (minutes) {
-				return __('time_units.time', { hours, minutes });
+				return Homey.__('time_units.time', { hours, minutes });
 			}
 			return hours;
 		}
@@ -495,15 +546,15 @@ class SpeechManager {
 	getRainIndicationString(indication) {
 		switch (indication) {
 			case Buienradar.rainIndicators.NO_RAIN:
-				return __('indicator.no');
+				return Homey.__('indicator.no');
 			case Buienradar.rainIndicators.LIGHT_RAIN:
-				return __('indicator.light');
+				return Homey.__('indicator.light');
 			case Buienradar.rainIndicators.MODERATE_RAIN:
-				return __('indicator.moderate');
+				return Homey.__('indicator.moderate');
 			case Buienradar.rainIndicators.HEAVY_RAIN:
-				return __('indicator.heavy');
+				return Homey.__('indicator.heavy');
 			case Buienradar.rainIndicators.VIOLENT_RAIN:
-				return __('indicator.violent');
+				return Homey.__('indicator.violent');
 			default:
 				return null;
 		}

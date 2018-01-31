@@ -27,339 +27,92 @@
     "homey:manager:speech-input",
     "homey:manager:geolocation"
   ],
-  "speech": [
-    {
-      "id": "rain",
-      "importance": 0.9,
-      "triggers": {
-        "en": [
-          "rain",
-          "raining",
-          "precipitation",
-          "rainfall",
-          "showers",
-          "drops",
-          "shower",
-          "drizzle"
-        ],
-        "nl": [
-          "regen",
-          "regent",
-          "regenen",
-          "bui",
-          "buien",
-          "buitje",
-          "neerslag",
-          "hemelwater",
-          "miezeren",
-          "druppels"
-        ]
+  "speech": {
+    "en": {
+      "element": {
+        "forecastsType": {
+          "type": "regex",
+          "value": "(rain|raining|precipitation|rainfall|showers|drops|shower|drizzle|dry)"
+        },
+        "objects": {
+          "type": "regex",
+          "value": "(umberella|umberellas|rain\\scoat|rain\\sclothes)"
+        },
+        "negates": {
+          "type": "regex",
+          "value": "(no|not|stop|end|ends|stops)"
+        },
+        "lightSeverity": {
+          "type": "regex",
+          "value": "(light|lightly|little|drizzle)"
+        },
+        "moderateSeverity": {
+          "type": "regex",
+          "value": "(moderate|moderately|normal)"
+        },
+        "highSeverity": {
+          "type": "regex",
+          "value": "(heavy|heavily|hard)"
+        },
+        "sentenceStarts": {
+          "type": "regex",
+          "value": "(Will|When|Is|Do)"
+        }
+      },
+      "group": {
+        "severities": {
+          "set": "lightSeverity || moderateSeverity || highSeverity",
+          "ordered": false,
+          "allowDisconnect": true,
+          "capturingGroup": false
+        },
+        "basic": {
+          "set": "sentenceStarts && forecastsType && (severities) && negates",
+          "ordered": false,
+          "allowDisconnect": true,
+          "capturingGroup": true
+        },
+        "object": {
+          "set": "sentenceStarts && objects && (negates)",
+          "ordered": false,
+          "allowDisconnect": true,
+          "capturingGroup": true
+        }
       }
     },
-    {
-      "id": "dry",
-      "importance": 0.7,
-      "triggers": {
-        "en": [
-          "dry"
-        ],
-        "nl": [
-          "droog"
-        ]
-      }
-    },
-    {
-      "id": "umbrella",
-      "importance": 0.9,
-      "triggers": {
-        "en": [
-          "umbrella",
-          "umbrellas",
-          "rain clothes",
-          "rain coat"
-        ],
-        "nl": [
-          "paraplu",
-          "paraplu's",
-          "parapluutje",
-          "parapluutjes",
-          "regen kleren",
-          "regenjas"
-        ]
-      }
-    },
-    {
-      "id": "negate",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "no",
-          "not",
-          "stop",
-          "end",
-          "ends",
-          "stops"
-        ],
-        "nl": [
-          "niet",
-          "geen",
-          "stoppen",
-          "stopt"
-        ]
-      }
-    },
-    {
-      "id": "in",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "in",
-          "at"
-        ],
-        "nl": [
-          "over",
-          "om"
-        ]
-      }
-    },
-    {
-      "id": "from_now",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "from now"
-        ],
-        "nl": [
-          "vanaf nu"
-        ]
-      }
-    },
-    {
-      "id": "start",
-      "importance": 0.1,
-      "triggers": {
-        "en": [
-          "start",
-          "begin"
-        ],
-        "nl": [
-          "starten",
-          "beginnen",
-          "start",
-          "begint"
-        ]
-      }
-    },
-    {
-      "id": "when",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "when",
-          "what time"
-        ],
-        "nl": [
-          "wanneer",
-          "op welke tijd",
-          "hoe laat"
-        ]
-      }
-    },
-    {
-      "id": "will",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "will"
-        ],
-        "nl": [
-          "gaat"
-        ]
-      }
-    },
-    {
-      "id": "going",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "going"
-        ],
-        "nl": [
-          "gaat"
-        ]
-      }
-    },
-    {
-      "id": "after",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "after"
-        ],
-        "nl": [
-          "over"
-        ]
-      }
-    },
-    {
-      "id": "expected",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "expected"
-        ],
-        "nl": [
-          "verwacht"
-        ]
-      }
-    },
-    {
-      "id": "for",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "for",
-          "at least"
-        ],
-        "nl": [
-          "voor",
-          "tot",
-          "minstens"
-        ]
-      }
-    },
-    {
-      "id": "coming",
-      "importance": 0.1,
-      "triggers": {
-        "en": [
-          "coming",
-          "following",
-          "next"
-        ],
-        "nl": [
-          "komende",
-          "volgende",
-          "aankomende"
-        ]
-      }
-    },
-    {
-      "id": "after",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "after",
-          "passed"
-        ],
-        "nl": [
-          "na",
-          "later"
-        ]
-      }
-    },
-    {
-      "id": "longer",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "longer",
-          "more than"
-        ],
-        "nl": [
-          "langer",
-          "meer dan"
-        ]
-      }
-    },
-    {
-      "id": "soon",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "soon",
-          "near future"
-        ],
-        "nl": [
-          "binnenkort",
-          "straks"
-        ]
-      }
-    },
-    {
-      "id": "light",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "light",
-          "lightly",
-          "little",
-          "drizzle"
-        ],
-        "nl": [
-          "licht",
-          "lichte",
-          "miezeren",
-          "iets",
-          "een beetje"
-        ]
-      }
-    },
-    {
-      "id": "moderate",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "moderate",
-          "moderately",
-          "normal"
-        ],
-        "nl": [
-          "gemiddeld",
-          "normaal"
-        ]
-      }
-    },
-    {
-      "id": "heavy",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "heavy",
-          "heavily",
-          "hard"
-        ],
-        "nl": [
-          "zwaar",
-          "zware",
-          "intens",
-          "hard",
-          "stevig",
-          "flink"
-        ]
-      }
-    },
-    {
-      "id": "violent",
-      "importance": false,
-      "triggers": {
-        "en": [
-          "violent",
-          "violently",
-          "intense",
-          "extreme"
-        ],
-        "nl": [
-          "zwaar",
-          "zware",
-          "intens",
-          "hard",
-          "stevig",
-          "flink"
-        ]
-      }
+    "nl": {
+      "element": {
+        "forecastsType": {
+          "type": "regex",
+          "value": "(regen|regent|regenen|bui|buien|buitje|neerslag|hemelwater|miezeren|druppels|droog)"
+        },
+        "objects": {
+          "type": "regex",
+          "value": "(paraplu|paraplu's|parapluutje|parapluutjes|regen\\skleren|regenjas)"
+        },
+        "negates": {
+          "type": "regex",
+          "value": "(niet|geen|stoppen|stopt)"
+        },
+        "lightSeverity": {
+          "type": "regex",
+          "value": "(licht|lichte|miezeren|iets|een\\sbeetje)"
+        },
+        "moderateSeverity": {
+          "type": "regex",
+          "value": "(gemiddeld|normaal)"
+        },
+        "highSeverity": {
+          "type": "regex",
+          "value": "(zwaar|zware|intens|hard|stevig|flink)"
+        },
+        "sentenceStarts": {
+          "type": "regex",
+          "value": "(Gaat|Wanneer|Blijft|Gaat|Regent|Heb|Is)"
+        }
     }
-  ],
+  }
+},
   "speechExamples": {
     "en": [
       "Will it rain?",
