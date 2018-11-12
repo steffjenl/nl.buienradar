@@ -1,56 +1,6 @@
 {
-	"yes": "yes,",
-	"no": "no,",
-	"no_but": "no, but",
-	"rain": {
-		"currently": "there currently is __rainType__rain",
-		"expected": "there is __rainType__rain expected",
-		"no_expected": "there is no __rainType__rain expected",
-		"will_be_no": "there will be no __rainType__rain",
-		"showers": "there are __amount__ showers expected in the next __time__"
-	},
-	"dry": {
-		"currently": "it is currently dry",
-		"expected": "it is expected to be dry",
-		"will_not": "it will not be dry"
-	},
-	"time": {
-		"in": "in __time__",
-		"for": "for __time__",
-		"for_period": "for a period of __time__ or longer",
-		"for_longer": "for longer than __time__",
-		"for_atleast": "for at least __time__",
-		"last_for": "wich will last for __time__",
-		"last_for_atleast": "wich will last for at least __time__",
-		"next_2_hours": "in the next 2 hours",
-		"started": "which already started",
-		"starting": "starting in __time__",
-		"combined": "and combined will last __time__"
-	},
-	"umbrella": {
-		"should": "you should bring your __umbrella__.",
-		"could": "you will probably need your __umbrella__.",
-		"shouldnt": "you can probably do without your __umbrella__.",
-		"dont": "you can leave your __umbrella__ at home."
-	},
-	"indicator": {
-		"no": "no",
-		"light": "light",
-		"moderate": "moderate",
-		"heavy": "heavy",
-		"violent": "violent"
-	},
-	"time_units": {
-		"hour": "__amount__ hour",
-		"minute": "__amount__ minute",
-		"hours": "__amount__ hours",
-		"minutes": "__amount__ minutes",
-		"time": "__hours__ and __minutes__"
-	},
-	"error": {
-		"no_data": "Sorry, I could not get the data from the Rain Radar server. Please try again later.",
-		"no_location": "Sorry, There is no valid gps location set. Please check your location in the settings menu of Homey.",
-		"404": "Sorry, I could not reach the Buien radar server. Please try again later.",
-		"could_not_parse": "Sorry, but I could not parse the data. Please try again later or send a email to support at athom dot com"
-	}
+  "rain_now_rain_future": "It's raining right now and it will continue raining for half an hour",
+  "rain_now_no_rain_future": "It's raining right now but it will stop raining within half an hour",
+  "no_rain_now_rain_future": "It's not raining right now but it will start raining within half an hour",
+  "no_rain_now_no_rain_future": "It's not raining right now and will stay so for half an hour"
 }

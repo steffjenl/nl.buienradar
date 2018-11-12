@@ -1,55 +1,6 @@
 {
-	"yes": "ja,",
-	"no": "nee,",
-	"no_but": "nee, alleen",
-	"rain": {
-		"currently": "momenteel is er __rainType__regen",
-		"expected": "er wordt __rainType__regen verwacht",
-		"no_expected": "er wordt geen __rainType__regen verwacht",
-		"will_be_no": "er komt geen __rainType__regen",
-		"showers": "er worden binnen nu en __time__ __amount__ buien verwacht"
-	},
-	"dry": {
-		"currently": "het is momenteel droog",
-		"expected": "het wordt verwacht droog te zijn",
-		"will_not": "het wordt niet droog"
-	},
-	"time": {
-		"in": "over __time__",
-		"for": "voor __time__",
-		"for_period": "voor een periode van __time__ of langer",
-		"for_longer": "voor langer dan __time__",
-		"for_atleast": "voor minstens __time__",
-		"last_for": "die __time__ zal duren",
-		"last_for_atleast": "die minstens __time__ zal duren",
-		"next_2_hours": "in de komende 2 uur",
-		"started": "waarvan de eerste al begonnen is",
-		"starting": "die beginnen over __time__",
-		"combined": "en deze zullen samen __time__ duren"
-	},
-	"umbrella": {
-		"should": "je kunt het best je __umbrella__ mee nemen.",
-		"could": "je zult je __umbrella__ waarschijnlijk nodig hebben.",
-		"shouldnt": "je kunt het waarschijnlijk zonder je __umbrella__ doen.",
-		"dont": "je kan je __umbrella__ thuis laten."
-	},
-	"indicator": {
-		"no": "geen",
-		"light": "lichte",
-		"moderate": "gemiddelde",
-		"heavy": "zware",
-		"violent": "hevige"
-	},
-	"time_units": {
-		"hour": "__amount__ uur",
-		"minute": "__amount__ minuut",
-		"hours": "__amount__ uur",
-		"minutes": "__amount__ minuten",
-		"time": "__hours__ en __minutes__"
-	},
-	"error": {
-		"no_data": "Sorry, Ik kan de data niet van de Buien Radar server krijgen. Probeer later opnieuw alstublieft.",
-		"no_location": "Sorry, er is geen correcte gps locatie ingesteld. Controleer alstublieft de locatie in het instellingen menu van Homey.",
-		"404": "Sorry, Ik kan de Buien Radar server niet bereiken. Probeer later opnieuw alstublieft."
-	}
+  "rain_now_rain_future": "Het regent nu en het zal het komend half uur blijven regenen",
+  "rain_now_no_rain_future": "Het regent nu maar het stopt met regenen binnen een half uur",
+  "no_rain_now_rain_future": "Het regent nu niet maar het zal gaan regenen binnen een half uur",
+  "no_rain_now_no_rain_future": "Het regent nu niet en het zal het komend half uur ook niet gaan regenen"
 }

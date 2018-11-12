@@ -1,11 +1,11 @@
 {
   "id": "nl.buienradar",
-  "version": "2.1.3",
-  "compatibility": ">=0.8",
+  "version": "3.0.0",
+  "compatibility": ">=1.5.0",
   "category": "internet",
   "sdk": 2,
   "name": {
-    "en": "Buienradar",
+    "en": "Rainradar",
     "nl": "Buienradar"
   },
   "description": {
@@ -19,9 +19,6 @@
     "large": "./assets/images/large.png",
     "small": "./assets/images/small.png"
   },
-  "dependencies": {
-    "request": "*"
-  },
   "permissions": [
     "homey:manager:speech-output",
     "homey:manager:speech-input",
@@ -30,51 +27,19 @@
   "speech": {
     "en": {
       "element": {
-        "forecastsType": {
+        "actionWords": {
           "type": "regex",
-          "value": "(rain|raining|precipitation|rainfall|showers|drops|shower|drizzle|dry)"
+          "value": "(is\\sit|will\\sit)"
         },
-        "objects": {
+        "rain": {
           "type": "regex",
-          "value": "(umberella|umberellas|rain\\scoat|rain\\sclothes)"
-        },
-        "negates": {
-          "type": "regex",
-          "value": "(no|not|stop|end|ends|stops)"
-        },
-        "lightSeverity": {
-          "type": "regex",
-          "value": "(light|lightly|little|drizzle)"
-        },
-        "moderateSeverity": {
-          "type": "regex",
-          "value": "(moderate|moderately|normal)"
-        },
-        "highSeverity": {
-          "type": "regex",
-          "value": "(heavy|heavily|hard)"
-        },
-        "sentenceStarts": {
-          "type": "regex",
-          "value": "(Will|When|Is|Do)"
+          "value": "(raining|rain|(be\\s)?dry)"
         }
       },
       "group": {
-        "severities": {
-          "set": "lightSeverity || moderateSeverity || highSeverity",
-          "ordered": false,
-          "allowDisconnect": true,
-          "capturingGroup": false
-        },
-        "basic": {
-          "set": "sentenceStarts && forecastsType && (severities) && negates",
-          "ordered": false,
-          "allowDisconnect": true,
-          "capturingGroup": true
-        },
-        "object": {
-          "set": "sentenceStarts && objects && (negates)",
-          "ordered": false,
+        "main": {
+          "set": "actionWords && rain",
+          "ordered": true,
           "allowDisconnect": true,
           "capturingGroup": true
         }
@@ -82,59 +47,25 @@
     },
     "nl": {
       "element": {
-        "forecastsType": {
+        "actionWords": {
           "type": "regex",
-          "value": "(regen|regent|regenen|bui|buien|buitje|neerslag|hemelwater|miezeren|druppels|droog)"
+          "value": "(gaat\\shet|is\\shet)"
         },
-        "objects": {
+        "rain": {
           "type": "regex",
-          "value": "(paraplu|paraplu's|parapluutje|parapluutjes|regen\\skleren|regenjas)"
-        },
-        "negates": {
-          "type": "regex",
-          "value": "(niet|geen|stoppen|stopt)"
-        },
-        "lightSeverity": {
-          "type": "regex",
-          "value": "(licht|lichte|miezeren|iets|een\\sbeetje)"
-        },
-        "moderateSeverity": {
-          "type": "regex",
-          "value": "(gemiddeld|normaal)"
-        },
-        "highSeverity": {
-          "type": "regex",
-          "value": "(zwaar|zware|intens|hard|stevig|flink)"
-        },
-        "sentenceStarts": {
-          "type": "regex",
-          "value": "(Gaat|Wanneer|Blijft|Gaat|Regent|Heb|Is)"
+          "value": "(regent|regenen|regen|droog"
         }
+      }
     }
-  }
-},
+  },
   "speechExamples": {
     "en": [
-      "Will it rain?",
-      "When will it start raining?",
-      "When will it stop raining?",
-      "When will the heavy rain stop?",
-      "When will it be dry for 30 minutes?",
-      "Will there be heavy rain?",
-      "Is it going to rain in 'x' minutes?",
-      "Is it raining right now?",
-      "Do I need to bring my umbrella?"
+      "Is it raining",
+      "Will it rain?"
     ],
     "nl": [
-      "Gaat het regenen?",
-      "Wanneer gaat het regenen?",
-      "Wanneer stopt het met regenen?",
-      "Wanneer stopt het met hard regenen?",
-      "blijft het de komende 30 minuten droog?",
-      "Gaat het hard regenen?",
-      "Regent het over 'x' minuten?",
-      "Regent het momenteel?",
-      "Heb ik een paraplu nodig?"
+      "Regent het?",
+      "Gaat het regenen?"
     ]
   },
   "flow": {
