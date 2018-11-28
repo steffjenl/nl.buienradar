@@ -2,5 +2,5 @@
   "rain_now_rain_future": "It's raining right now and it will continue raining for half an hour",
   "rain_now_no_rain_future": "It's raining right now but it will stop raining within half an hour",
   "no_rain_now_rain_future": "It's not raining right now but it will start raining within half an hour",
-  "no_rain_now_no_rain_future": "It's not raining right now and will stay so for half an hour"
+  "no_rain_now_no_rain_future": "It's not raining right now and it will stay so for half an hour"
 }

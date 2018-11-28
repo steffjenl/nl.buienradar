@@ -1,6 +1,6 @@
 {
   "id": "nl.buienradar",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "compatibility": ">=1.5.0",
   "category": "internet",
   "sdk": 2,
@@ -49,11 +49,11 @@
       "element": {
         "actionWords": {
           "type": "regex",
-          "value": "(gaat\\shet|is\\shet)"
+          "value": "(wanneer|gaat\\shet|is\\shet)"
         },
         "rain": {
           "type": "regex",
-          "value": "(regent|regenen|regen|droog"
+          "value": "(regent|regenen|regen|droog)"
         }
       }
     }

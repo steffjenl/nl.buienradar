@@ -1,19 +1,19 @@
 ### Buienradar app for Homey  
 Turn Homey into your personal 'buienradar'.  
-With this app Homey will know everything about the expected rain within the coming two hours.
+With this app Homey will know everything about the expected rain.
 
 
 ##### Speech triggers: 
 
-"When will it start raining?",  
-"When will it stop raining?",  
-"When will the heavy rain stop?",  
-"When will it be dry for 30 minutes?",  
-"Will there be heavy rain",  
-"Is it going to rain in 'x' minutes?",  
-"Is it raining right now?",  
-"Do I need to bring my umbrella?"  
-... and more!
+"Will it rain?"
+
+"Is it going to rain?"
+
+"Is it raining?"
+
+"Will it be dry?"
+
+"Is it dry outside?"
 
 ##### Flow triggers:  
 
