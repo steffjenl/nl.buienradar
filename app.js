@@ -2,21 +2,27 @@
 
 const Homey = require('homey');
 const Buienradar = require('buienradar');
+const RAIN_THRESHOLD = 0.2;
 
 class BuienradarApp extends Homey.App {
     async onInit() {
         this.rainingState = null;
 
+        this.resetBuienRadarAPI();
+        Homey.ManagerGeolocation.on('location', this.resetBuienRadarAPI.bind(this));
+
+        this.initSpeech();
+        this.initFlows();
+        setInterval(this.poll.bind(this), 5 * 60 * 1000);
+
+        this.log('Buienradar is running...');
+    }
+
+    resetBuienRadarAPI() {
         let latitude = Homey.ManagerGeolocation.getLatitude();
         let longitude = Homey.ManagerGeolocation.getLongitude();
 
         this.api = new Buienradar({ lat: latitude, lon: longitude });
-
-        this.initSpeech();
-        this.initFlows();
-        setInterval(this.poll.bind(this), 10000);
-
-        this.log('Buienradar is running...');
     }
 
     initSpeech() {
@@ -54,12 +60,11 @@ class BuienradarApp extends Homey.App {
 
         this.rainCondition = new Homey.FlowCardCondition('is_raining').register()
             .registerRunListener(async (args, state) => {
-                return await this.checkRainAtTime();
+                return this.rainingState;
             });
         this.rainInCondition = new Homey.FlowCardCondition('raining_in').register()
             .registerRunListener(async (args, state) => {
                 let time = this.addMinutesToTime(new Date(), args.when);
-
                 return await this.checkRainAtTime(time);
             });
     }
@@ -69,40 +74,49 @@ class BuienradarApp extends Homey.App {
     }
 
     calculateTimeDifference(before, after) {
-        let difference = after.getTime() - before.getTime();
-        return Math.ceil(difference / (60000));
+        let differenceMS = after.getTime() - before.getTime();
+        return Math.ceil(differenceMS / (60000));
     }
 
     async checkRainAtTime(time = new Date()) {
         let result = await this.api.getNextForecast({after: time});
-        return result.mmh > 0.2;
+        return result.mmh > RAIN_THRESHOLD;
     }
 
     async poll() {
+        // Check if it is raining at this moment
         let now = new Date();
-        let results = await this.api.getForecasts();
+        let rainState = await this.checkRainAtTime(now);
 
-        for (let i = 0; i < results.length; i++) {
-            let result = results[i];
-            let timeDiff = this.calculateTimeDifference(now, new Date(result.date));
+        if (!rainState && this.rainingState === true) {
+            this.rainingState = false;
+            this.log(`TRIGGERING FLOW STOP: Time: ${now}, raining: ${rainState}`);
+            this.rainStopTrigger.trigger();
+        } else if (rainState && this.rainingState === false) {
+            this.rainingState = true;
+            this.log(`TRIGGERING FLOW START: Time: ${now}, raining: ${rainState}`);
+            this.rainStartTrigger.trigger();
+        }
 
-            if (0 <= timeDiff <= 5) {
-                if (this.rainingState === null) {
-                    this.rainingState = result.mmh > 0.2;
-                } else if (result.mmh <= 0.2 && this.rainingState === true) {
-                    this.rainingState = false;
-                    this.rainStopTrigger.trigger();
-                } else if (result.mmh > 0.2 && this.rainingState === false) {
-                    this.rainingState = true;
-                    this.rainStartTrigger.trigger();
-                }
+        // Loop over possibilities for rain starting or stopping in the next 120 minutes
+        for (let i = 0; i < 8; i++) {
+            let inMinutes = 0;
+            switch (i) {
+                case 0: inMinutes = 5; break;
+                case 1: inMinutes = 10; break;
+                case 2: inMinutes = 15; break;
+                case 3: inMinutes = 30; break;
+                case 4: inMinutes = 45; break;
+                case 5: inMinutes = 60; break;
+                case 6: inMinutes = 90; break;
+                case 7: inMinutes = 120; break;
             }
 
-            else if (0 <= timeDiff && result.mmh <= 0.2) {
-                this.dryInTrigger.trigger(null, {when: timeDiff.toString()});
-            } else if (0 <= timeDiff && result.mmh > 0.2) {
-                this.rainInTrigger.trigger(null, {when: timeDiff.toString()});
-            }
+            let atTime = this.addMinutesToTime(now, inMinutes);
+            let rainState = await this.checkRainAtTime(atTime);
+
+            if (!rainState && this.rainingState === true) this.dryInTrigger(null, {when: inMinutes.toString()});
+            else if (rainState && this.rainingState === false) this.rainInTrigger(null, {when: inMinutes.toString()});
         }
     }
 }
