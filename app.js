@@ -3,6 +3,7 @@
 const Homey = require('homey');
 const Buienradar = require('buienradar');
 const RAIN_THRESHOLD = 0.2;
+const MINUTE = 60000;
 
 class BuienradarApp extends Homey.App {
     async onInit() {
@@ -13,7 +14,7 @@ class BuienradarApp extends Homey.App {
 
         this.initSpeech();
         this.initFlows();
-        setInterval(this.poll.bind(this), 5 * 60 * 1000);
+        setInterval(this.poll.bind(this), 5 * MINUTE);
 
         this.log('Buienradar is running...');
     }
@@ -73,14 +74,13 @@ class BuienradarApp extends Homey.App {
         return new Date(time.getTime() + minutes * 60000);
     }
 
-    calculateTimeDifference(before, after) {
-        let differenceMS = after.getTime() - before.getTime();
-        return Math.ceil(differenceMS / (60000));
-    }
-
     async checkRainAtTime(time = new Date()) {
-        let result = await this.api.getNextForecast({after: time});
-        return result.mmh > RAIN_THRESHOLD;
+        try {
+            let result = await this.api.getNextForecast({after: time});
+            return result.mmh > RAIN_THRESHOLD;
+        } catch (e) {
+            this.error(e);
+        }
     }
 
     async poll() {
@@ -88,7 +88,11 @@ class BuienradarApp extends Homey.App {
         let now = new Date();
         let rainState = await this.checkRainAtTime(now);
 
-        if (!rainState && this.rainingState === true) {
+        this.log(`CHECKING CURRENT STATE: Rainstate: ${this.rainingState}, raining now: ${rainState}`);
+
+        if (this.rainingState === null) {
+            this.rainingState = rainState;
+        } else if (!rainState && this.rainingState === true) {
             this.rainingState = false;
             this.log(`TRIGGERING FLOW STOP: Time: ${now}, raining: ${rainState}`);
             this.rainStopTrigger.trigger();
@@ -99,6 +103,9 @@ class BuienradarApp extends Homey.App {
         }
 
         // Loop over possibilities for rain starting or stopping in the next 120 minutes
+        let rainStopTriggered = false;
+        let rainStartTriggered = false;
+
         for (let i = 0; i < 8; i++) {
             let inMinutes = 0;
             switch (i) {
@@ -109,14 +116,24 @@ class BuienradarApp extends Homey.App {
                 case 4: inMinutes = 45; break;
                 case 5: inMinutes = 60; break;
                 case 6: inMinutes = 90; break;
-                case 7: inMinutes = 120; break;
+                case 7: inMinutes = 110; break;
             }
 
             let atTime = this.addMinutesToTime(now, inMinutes);
             let rainState = await this.checkRainAtTime(atTime);
 
-            if (!rainState && this.rainingState === true) this.dryInTrigger(null, {when: inMinutes.toString()});
-            else if (rainState && this.rainingState === false) this.rainInTrigger(null, {when: inMinutes.toString()});
+            this.log(`CHECKING STATE IN ${inMinutes} MINUTES: Rainstate: ${this.rainingState}, raining then: ${rainState}`);
+
+            if (!rainState && this.rainingState === true && rainStopTriggered === false) {
+                this.log(`TRIGGERING FLOW STOP IN: Time: ${atTime}, raining: ${rainState}`);
+                this.dryInTrigger.trigger(null, {when: inMinutes.toString()});
+                rainStopTriggered = true;
+            }
+            else if (rainState && this.rainingState === false && rainStartTriggered === false) {
+                this.log(`TRIGGERING FLOW START IN: Time: ${atTime}, raining: ${rainState}`);
+                this.rainInTrigger.trigger(null, {when: inMinutes.toString()});
+                rainStartTriggered = true;
+            }
         }
     }
 }
