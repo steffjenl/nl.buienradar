@@ -8,13 +8,15 @@ const MINUTE = 60000;
 class BuienradarApp extends Homey.App {
     async onInit() {
         this.rainingState = null;
+        this.rainStopTriggered = false;
+        this.rainStartTriggered = false;
 
         this.resetBuienRadarAPI();
         Homey.ManagerGeolocation.on('location', this.resetBuienRadarAPI.bind(this));
 
         this.initSpeech();
         this.initFlows();
-        setInterval(this.poll.bind(this), 5 * MINUTE);
+        setInterval(this.poll.bind(this), 5000);
 
         this.log('Buienradar is running...');
     }
@@ -103,9 +105,6 @@ class BuienradarApp extends Homey.App {
         }
 
         // Loop over possibilities for rain starting or stopping in the next 120 minutes
-        let rainStopTriggered = false;
-        let rainStartTriggered = false;
-
         for (let i = 0; i < 8; i++) {
             let inMinutes = 0;
             switch (i) {
@@ -124,15 +123,23 @@ class BuienradarApp extends Homey.App {
 
             this.log(`CHECKING STATE IN ${inMinutes} MINUTES: Rainstate: ${this.rainingState}, raining then: ${rainState}`);
 
-            if (!rainState && this.rainingState === true && rainStopTriggered === false) {
+            if (!rainState && this.rainingState === true && this.rainStopTriggered === false) {
                 this.log(`TRIGGERING FLOW STOP IN: Time: ${atTime}, raining: ${rainState}`);
                 this.dryInTrigger.trigger(null, {when: inMinutes.toString()});
-                rainStopTriggered = true;
+
+                this.rainStopTriggered = true;
+                setTimeout(() => {
+                    this.rainStopTriggered = false;
+                }, inMinutes * MINUTE);
             }
-            else if (rainState && this.rainingState === false && rainStartTriggered === false) {
+            else if (rainState && this.rainingState === false && this.rainStartTriggered === false) {
                 this.log(`TRIGGERING FLOW START IN: Time: ${atTime}, raining: ${rainState}`);
                 this.rainInTrigger.trigger(null, {when: inMinutes.toString()});
-                rainStartTriggered = true;
+
+                this.rainStartTriggered = true;
+                setTimeout(() => {
+                    this.rainStartTriggered = false;
+                }, inMinutes * MINUTE);
             }
         }
     }
