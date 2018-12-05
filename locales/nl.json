@@ -1,6 +1,6 @@
 {
-  "rain_now_rain_future": "Het regent nu en het zal het komend half uur blijven regenen",
-  "rain_now_no_rain_future": "Het regent nu maar het stopt met regenen binnen een half uur",
-  "no_rain_now_rain_future": "Het regent nu niet maar het zal gaan regenen binnen een half uur",
-  "no_rain_now_no_rain_future": "Het regent nu niet en het zal het komend half uur ook niet gaan regenen"
+  "rain_now_rain_future": "Het regent nu, en het zal het komend half uur blijven regenen.",
+  "rain_now_no_rain_future": "Het regent nu, maar binnen een half uur stopt het met regenen.",
+  "no_rain_now_rain_future": "Het regent nu niet, maar binnen een half uur gaat het regenen.",
+  "no_rain_now_no_rain_future": "Het regent nu niet, en het zal het komend half uur ook niet gaan regenen."
 }
