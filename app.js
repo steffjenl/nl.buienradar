@@ -16,7 +16,8 @@ class BuienradarApp extends Homey.App {
 
         this.initSpeech();
         this.initFlows();
-        setInterval(this.poll.bind(this), 5 * MINUTE);
+        this.poll();
+        setInterval(this.poll.bind(this), 60 * 1000);
 
         this.log('Buienradar is running...');
     }
@@ -90,7 +91,11 @@ class BuienradarApp extends Homey.App {
         let now = new Date();
         let rainState = await this.checkRainAtTime(now);
 
-        this.log(`CHECKING CURRENT STATE: Rainstate: ${this.rainingState}, raining now: ${rainState}`);
+        this.log('==========================');
+        this.log('RAIN STATE DATA CURRENTLY:');
+        this.log('==========================');
+        this.log(`SAVED RAIN STATE: ${rainState}`);
+        this.log(`RAINING NOW: ${rainState}`);
 
         if (this.rainingState === null) {
             this.rainingState = rainState;
@@ -104,6 +109,9 @@ class BuienradarApp extends Homey.App {
             this.rainStartTrigger.trigger();
         }
 
+        this.log('==========================');
+        this.log('RAIN DATA IN THE FUTURE:');
+        this.log('==========================');
         // Loop over possibilities for rain starting or stopping in the next 120 minutes
         for (let i = 0; i < 8; i++) {
             let inMinutes = 0;
@@ -121,7 +129,7 @@ class BuienradarApp extends Homey.App {
             let atTime = this.addMinutesToTime(now, inMinutes);
             let rainState = await this.checkRainAtTime(atTime);
 
-            this.log(`CHECKING STATE IN ${inMinutes} MINUTES: Rainstate: ${this.rainingState}, raining then: ${rainState}`);
+            this.log(`RAINING IN ${inMinutes} MINUTES: ${rainState}`);
 
             if (!rainState && this.rainingState === true && this.rainStopTriggered === false) {
                 this.log(`TRIGGERING FLOW STOP IN: Time: ${atTime}, raining: ${rainState}`);
@@ -142,6 +150,8 @@ class BuienradarApp extends Homey.App {
                 }, inMinutes * MINUTE);
             }
         }
+
+        this.log('==========================\n\n');
     }
 }
 
