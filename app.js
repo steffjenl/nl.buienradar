@@ -2,7 +2,7 @@
 
 const Homey = require('homey');
 const Buienradar = require('./lib/buienradar');
-const RAIN_THRESHOLD = 0.2;
+const RAIN_THRESHOLD = 0.1;
 const MINUTE = 60000;
 
 class BuienradarApp extends Homey.App {
