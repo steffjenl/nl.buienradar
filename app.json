@@ -1,6 +1,7 @@
 {
   "id": "nl.buienradar",
-  "version": "3.0.8",
+  "brandColor": "#092B7E",
+  "version": "3.0.10",
   "compatibility": ">=1.5.0",
   "category": "internet",
   "sdk": 2,
