@@ -4,12 +4,21 @@ const Homey = require('homey');
 const Buienradar = require('./lib/buienradar');
 const RAIN_THRESHOLD = 0.1;
 const MINUTE = 60000;
+const timeMap = {
+    0: 0,
+    1: 5,
+    2: 10,
+    3: 15,
+    4: 30,
+    5: 45,
+    6: 60,
+    7: 90,
+    8: 120
+};
 
 class BuienradarApp extends Homey.App {
     async onInit() {
-        this.rainingState = null;
-        this.rainStopTriggered = false;
-        this.rainStartTriggered = false;
+        this.isRaining = null;
 
         this.resetBuienRadarAPI();
         Homey.ManagerGeolocation.on('location', this.resetBuienRadarAPI.bind(this));
@@ -46,7 +55,7 @@ class BuienradarApp extends Homey.App {
                 forecasts = await this.api.getForecastsInsecure();
             }
 
-            forecasts = this.trimForecasts(forecasts);
+            forecasts = this.parseForecast(forecasts);
 
             let now = this.checkIfRaining(forecasts[0]);
             let future = this.checkIfRaining(forecasts[4]);
@@ -75,102 +84,76 @@ class BuienradarApp extends Homey.App {
 
         this.rainCondition = new Homey.FlowCardCondition('is_raining').register()
             .registerRunListener(async (args, state) => {
-                return this.rainingState;
+                return this.isRaining;
             });
         this.rainInCondition = new Homey.FlowCardCondition('raining_in').register()
             .registerRunListener(async (args, state) => {
-                let time = this.addMinutesToTime(new Date(), args.when);
-                return await this.checkRainAtTime(time);
+                let forecast = await this.getForecast();
+
+                // Select the forecast we need
+                forecast = forecast[args.when];
+                return this.checkIfRaining(forecast);
             });
     }
 
     checkIfRaining(forecast) {
-        return forecast.mmh >= RAIN_THRESHOLD;
+        return forecast >= RAIN_THRESHOLD;
     }
 
-    trimForecasts(forecasts) {
-        let trimmed = forecasts.slice(0, 4);
-        trimmed.push(forecasts[6]);
-        trimmed.push(forecasts[9]);
-        trimmed.push(forecasts[12]);
-        trimmed.push(forecasts[18]);
-        trimmed.push(forecasts[23]);
+    async getForecast() {
+        // Get forecast object containing 0 - 120 minutes of rain data
+        let forecast = null;
+        try {
+            forecast = await this.api.getForecasts();
+        } catch (e) {
+            forecast = await this.api.getForecastsInsecure();
+        }
+        return this.parseForecast(forecast);
+    }
 
-        return trimmed;
+    parseForecast(forecast) {
+        let trimmed = forecast.slice(0, 4);
+        trimmed.push(forecast[6]);
+        trimmed.push(forecast[9]);
+        trimmed.push(forecast[12]);
+        trimmed.push(forecast[18]);
+        trimmed.push(forecast[23]);
+
+        let parsed = {};
+        for (let i = 0; i < trimmed.length; i++) {
+            parsed[timeMap[i]] = trimmed[i].mmh
+        }
+
+        return parsed;
     }
 
     async poll() {
-        // Check if it is raining at this moment
-        let forecasts = null;
+        let forecast = await this.getForecast();
 
-        try {
-            forecasts = await this.api.getForecasts();
-        } catch (e) {
-            forecasts = await this.api.getForecastsInsecure();
-        }
+        // Loop over forecasts and trigger when needed
+        let futureTriggered = false;
 
-        forecasts = this.trimForecasts(forecasts);
-        let rainState = this.checkIfRaining(forecasts[0]);
+        for (let when in forecast) {
+            if (forecast.hasOwnProperty(when)) {
+                const raining = this.checkIfRaining(forecast[when]);
 
-        this.log('==========================');
-        this.log('RAIN STATE DATA CURRENTLY:');
-        this.log('==========================');
-        this.log(`SAVED RAIN STATE: ${this.rainingState}`);
-        this.log(`RAINING NOW: ${rainState}`);
-
-        if (this.rainingState === null) {
-            this.rainingState = rainState;
-        } else if (!rainState && this.rainingState === true) {
-            this.rainingState = false;
-            this.log(`TRIGGERING FLOW RAIN STOP`);
-            this.rainStopTrigger.trigger();
-        } else if (rainState && this.rainingState === false) {
-            this.rainingState = true;
-            this.log(`TRIGGERING FLOW RAIN START`);
-            this.rainStartTrigger.trigger();
-        }
-
-        this.log('==========================');
-        this.log('RAIN DATA IN THE FUTURE:');
-        this.log('==========================');
-        // Loop over possibilities for rain starting or stopping in the next 120 minutes
-        for (let i = 1; i < forecasts.length; i++) {
-            let inMinutes = 0;
-            switch (i) {
-                case 1: inMinutes = 5; break;
-                case 2: inMinutes = 10; break;
-                case 3: inMinutes = 15; break;
-                case 4: inMinutes = 30; break;
-                case 5: inMinutes = 45; break;
-                case 6: inMinutes = 60; break;
-                case 7: inMinutes = 90; break;
-                case 8: inMinutes = 110; break;
-            }
-
-            let rainState = this.checkIfRaining(forecasts[i]);
-            this.log(`RAINING IN ${inMinutes} MINUTES: ${rainState}`);
-
-            if (!rainState && this.rainingState === true && this.rainStopTriggered === false) {
-                this.log(`TRIGGERING FLOW RAIN STOP IN: ${inMinutes} Minutes`);
-                this.dryInTrigger.trigger(null, {when: inMinutes.toString()});
-
-                this.rainStopTriggered = true;
-                setTimeout(() => {
-                    this.rainStopTriggered = false;
-                }, inMinutes * MINUTE);
-            }
-            else if (rainState && this.rainingState === false && this.rainStartTriggered === false) {
-                this.log(`TRIGGERING FLOW RAIN START IN: ${inMinutes} Minutes`);
-                this.rainInTrigger.trigger(null, {when: inMinutes.toString()});
-
-                this.rainStartTriggered = true;
-                setTimeout(() => {
-                    this.rainStartTriggered = false;
-                }, inMinutes * MINUTE);
+                if (this.isRaining !== raining) {
+                    if (when === '0') {
+                        if (raining) this.rainStartTrigger.trigger();
+                        else this.rainStopTrigger.trigger();
+                        this.isRaining = raining;
+                    }
+                    else if (raining && !futureTriggered) {
+                        this.rainInTrigger.trigger(null, {when});
+                        futureTriggered = true;
+                    }
+                    else if (!raining && !futureTriggered) {
+                        this.dryInTrigger.trigger(null, {when});
+                        futureTriggered = true;
+                    }
+                }
             }
         }
-
-        this.log('==========================\n\n');
     }
 }
 
