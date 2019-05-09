@@ -129,29 +129,36 @@ class BuienradarApp extends Homey.App {
 
     async poll() {
         let forecast = await this.getForecast();
+        this.log(forecast);
 
-        // Loop over forecasts and trigger when needed
-        let futureTriggered = false;
+        let lastRainingState = null;
 
         for (let when in forecast) {
             if (forecast.hasOwnProperty(when)) {
                 const raining = this.checkIfRaining(forecast[when]);
 
-                if (this.isRaining !== raining) {
-                    if (when === '0') {
-                        if (raining) this.rainStartTrigger.trigger();
-                        else this.rainStopTrigger.trigger();
-                        this.isRaining = raining;
+                if (this.isRaining !== raining && when === '0') {
+                    if (raining) {
+                        this.log('IT STARTED RAINING: NOW');
+                        this.rainStartTrigger.trigger();
                     }
-                    else if (raining && !futureTriggered) {
+                    else {
+                        this.log('IT STOPPED RAINING: NOW');
+                        this.rainStopTrigger.trigger();
+                    }
+                    this.isRaining = raining;
+                } else if (raining !== lastRainingState && when !== '0') {
+                    if (raining) {
+                        this.log(`IT WILL START RAINING IN ${when} MINUTES`);
                         this.rainInTrigger.trigger(null, {when});
-                        futureTriggered = true;
                     }
-                    else if (!raining && !futureTriggered) {
+                    else {
+                        this.log(`IT WILL STOP RAINING IN ${when} MINUTES`);
                         this.dryInTrigger.trigger(null, {when});
-                        futureTriggered = true;
                     }
                 }
+
+                lastRainingState = raining;
             }
         }
     }
