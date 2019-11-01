@@ -28,7 +28,7 @@ class BuienradarApp extends Homey.App {
 
         this.poll();
 
-        setInterval(this.poll.bind(this), 6 * MINUTE);
+        setInterval(this.poll.bind(this), 5 * MINUTE);
 
         this.log('Buienradar is running...');
     }
