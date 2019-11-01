@@ -75,11 +75,13 @@ class BuienradarApp extends Homey.App {
 
         this.rainInTrigger = new Homey.FlowCardTrigger('raining_in').register()
             .registerRunListener((args, state) => {
-
+                if (args.when === state.when) return true
+                else return false;
             });
         this.dryInTrigger = new Homey.FlowCardTrigger('dry_in').register()
             .registerRunListener((args, state) => {
-
+                if (args.when === state.when) return true
+                else return false;
             });
 
         this.rainCondition = new Homey.FlowCardCondition('is_raining').register()
@@ -137,23 +139,25 @@ class BuienradarApp extends Homey.App {
             if (forecast.hasOwnProperty(when)) {
                 const raining = this.checkIfRaining(forecast[when]);
 
+                console.log(`Forecast for: ${when}m rain: ${forecast[when]}mm`);
+
                 if (this.isRaining !== raining && when === '0') {
                     if (raining) {
-                        this.log('IT STARTED RAINING: NOW');
+                        this.log('Raining started: NOW');
                         this.rainStartTrigger.trigger();
                     }
                     else {
-                        this.log('IT STOPPED RAINING: NOW');
+                        this.log('Raining stopped: NOW');
                         this.rainStopTrigger.trigger();
                     }
                     this.isRaining = raining;
                 } else if (raining !== lastRainingState && when !== '0') {
                     if (raining) {
-                        this.log(`IT WILL START RAINING IN ${when} MINUTES`);
+                        this.log(`Rain is coming in ${when} minutes`);
                         this.rainInTrigger.trigger(null, {when});
                     }
                     else {
-                        this.log(`IT WILL STOP RAINING IN ${when} MINUTES`);
+                        this.log(`Rain is ending in ${when} MINUTES`);
                         this.dryInTrigger.trigger(null, {when});
                     }
                 }
