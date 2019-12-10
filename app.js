@@ -55,6 +55,7 @@ class BuienradarApp extends Homey.App {
                 forecasts = await this.api.getForecastsInsecure();
             }
 
+            if (!forecasts) return;
             forecasts = this.parseForecast(forecasts);
 
             let now = this.checkIfRaining(forecasts[0]);
@@ -110,6 +111,7 @@ class BuienradarApp extends Homey.App {
         } catch (e) {
             forecast = await this.api.getForecastsInsecure();
         }
+        if (!forecast || forecast.length === 0) return new Error('Could not obtain forecasts');
         return this.parseForecast(forecast);
     }
 
@@ -131,7 +133,6 @@ class BuienradarApp extends Homey.App {
 
     async poll() {
         let forecast = await this.getForecast();
-        this.log(forecast);
 
         let lastRainingState = null;
 
@@ -139,7 +140,7 @@ class BuienradarApp extends Homey.App {
             if (forecast.hasOwnProperty(when)) {
                 const raining = this.checkIfRaining(forecast[when]);
 
-                console.log(`Forecast for: ${when}m rain: ${forecast[when]}mm`);
+                this.log(`Forecast for: ${when}m rain: ${forecast[when]}mm`);
 
                 if (this.isRaining !== raining && when === '0') {
                     if (raining) {
