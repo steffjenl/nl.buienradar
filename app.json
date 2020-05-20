@@ -1,6 +1,7 @@
 {
   "id": "nl.buienradar",
-  "version": "3.0.7",
+  "brandColor": "#092B7E",
+  "version": "3.0.15",
   "compatibility": ">=1.5.0",
   "category": "internet",
   "sdk": 2,
@@ -96,13 +97,6 @@
             "type": "dropdown",
             "values": [
               {
-                "id": "5",
-                "label": {
-                  "en": "5 minutes",
-                  "nl": "5 minuten"
-                }
-              },
-              {
                 "id": "10",
                 "label": {
                   "en": "10 minutes",
@@ -166,13 +160,6 @@
             "name": "when",
             "type": "dropdown",
             "values": [
-              {
-                "id": "5",
-                "label": {
-                  "en": "5 minutes",
-                  "nl": "5 minuten"
-                }
-              },
               {
                 "id": "10",
                 "label": {
@@ -246,13 +233,6 @@
             "name": "when",
             "type": "dropdown",
             "values": [
-              {
-                "id": "5",
-                "label": {
-                  "en": "5 minutes",
-                  "nl": "5 minuten"
-                }
-              },
               {
                 "id": "10",
                 "label": {
